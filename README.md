@@ -1,6 +1,6 @@
 # Wavex
 
-**TODO: Add description**
+Read and write WAVE files and data.
 
 ## Installation
 
