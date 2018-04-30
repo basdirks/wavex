@@ -24,11 +24,15 @@ defmodule Wavex.FormatChunk do
   end
 
   @spec verify_bits_per_sample(non_neg_integer) :: :ok | {:error, binary}
-  def verify_bits_per_sample(bits_per_sample) when bits_per_sample in [8, 16, 24], do: :ok
+  defp verify_bits_per_sample(bits_per_sample) when bits_per_sample in [8, 16, 24], do: :ok
 
-  def verify_bits_per_sample(bits_per_sample) do
+  defp verify_bits_per_sample(bits_per_sample) do
     {:error, "expected bits per sample to be 8, 16, or 24, got: #{bits_per_sample}"}
   end
+
+  @spec verify_channels(non_neg_integer) :: :ok | {:error, binary}
+  defp verify_channels(0), do: {:error, "expected channels > 0"}
+  defp verify_channels(_), do: :ok
 
   @spec validate(t) :: :ok | {:error, binary}
   defp validate(%__MODULE__{
