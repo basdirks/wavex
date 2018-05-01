@@ -1,6 +1,6 @@
 defmodule Wavex.FormatChunk do
   @moduledoc """
-  Read a format chunk.
+  Reading a format chunk.
   """
 
   alias Wavex.Utils
@@ -75,14 +75,22 @@ defmodule Wavex.FormatChunk do
 
   ## Examples
 
-  From [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/):
+  [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/)
 
-      iex> Wavex.FormatChunk.read(<<0x0066, 0x006d, 0x0074, 0x0020,
-      ...>                          0x0010, 0x0000, 0x0000, 0x0000,
-      ...>                          0x0001, 0x0000, 0x0002, 0x0000,
-      ...>                          0x0022, 0x0056, 0x0000, 0x0000,
-      ...>                          0x0088, 0x0058, 0x0001, 0x0000,
-      ...>                          0x0004, 0x0000, 0x0010, 0x0000>>)
+      iex Wavex.FormatChunk.read(<<
+      ...> # f     m     t     \s
+      ...>   0x66, 0x6d, 0x74, 0x20,
+      ...> # 16
+      ...>   0x10, 0x00, 0x00, 0x00,
+      ...> # 1           2
+      ...>   0x01, 0x00, 0x02, 0x00,
+      ...> # 22050
+      ...>   0x22, 0x56, 0x00, 0x00,
+      ...> # 88200
+      ...>   0x88, 0x58, 0x01, 0x00,
+      ...> # 4           16
+      ...>   0x04, 0x00, 0x10, 0x00,
+      ...> >>)
       {:ok,
       %Wavex.FormatChunk{
         bits_per_sample: 16,
