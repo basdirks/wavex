@@ -1,11 +1,13 @@
 defmodule Wavex.DataChunk do
-  @moduledoc false
+  @moduledoc """
+  Read a data chunk.
+  """
 
   alias Wavex.Utils
 
   defstruct [:size, :data]
 
-  @type t :: %__MODULE__{}
+  @type t :: %__MODULE__{size: non_neg_integer, data: binary}
 
   @spec read(binary) :: {:ok, t} | {:error, binary}
   def read(binary) when is_binary(binary) do
