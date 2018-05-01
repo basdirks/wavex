@@ -1,6 +1,6 @@
 defmodule Wavex.RIFFHeader do
   @moduledoc """
-  Read a RIFF header.
+  Reading a RIFF header.
   """
 
   alias Wavex.Utils
@@ -14,15 +14,17 @@ defmodule Wavex.RIFFHeader do
 
   ## Examples
 
-  From [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/):
+  [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/)
 
-      iex> Wavex.RIFFHeader.read(<<0x0052, 0x0049, 0x0046, 0x0046,
-      ...>                         0x0024, 0x0008, 0x0000, 0x0000,
-      ...>                         0x0057, 0x0041, 0x0056, 0x0045>>)
+      iex> Wavex.RIFFHeader.read(<<
+      ...> # R     I     F     F
+      ...>   0x52, 0x49, 0x46, 0x46,
+      ...> # 38
+      ...>   0x24, 0x08, 0x00, 0x00,
+      ...> # W     A     V     E
+      ...>   0x57, 0x41, 0x56, 0x45
+      ...> >>)
       {:ok, %Wavex.RIFFHeader{size: 2084}, ""}
-
-      iex> Wavex.RIFFHeader.read(<<"RIFX", 0, 0, 0, 0, "WAVE">>)
-      {:error, "expected chunk id 'RIFF', got: 'RIFX'"}
 
       iex> Wavex.RIFFHeader.read(<<"RIFX", 0, 0, 0, 0, "WAVE">>)
       {:error, "expected chunk id 'RIFF', got: 'RIFX'"}
