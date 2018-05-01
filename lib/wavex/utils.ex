@@ -1,6 +1,6 @@
 defmodule Wavex.Utils do
   @moduledoc """
-  Reading utilities.
+  Reading binary data.
   """
 
   @spec verify(binary, t, t) :: :ok | {:error, binary} when t: var
