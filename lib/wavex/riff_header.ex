@@ -1,11 +1,13 @@
 defmodule Wavex.RIFFHeader do
-  @moduledoc false
+  @moduledoc """
+  Read a RIFF header.
+  """
 
   alias Wavex.Utils
 
   defstruct [:size]
 
-  @type t :: %__MODULE__{}
+  @type t :: %__MODULE__{size: pos_integer}
 
   @doc ~S"""
   Read a RIFF header.
