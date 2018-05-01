@@ -9,6 +9,9 @@ defmodule Wavex.DataChunk do
 
   @type t :: %__MODULE__{size: non_neg_integer, data: binary}
 
+  @doc ~S"""
+  Read a data chunk.
+  """
   @spec read(binary) :: {:ok, t} | {:error, binary}
   def read(binary) when is_binary(binary) do
     with {:ok, etc} <- Utils.read_id(binary, "data"),
