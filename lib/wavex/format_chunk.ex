@@ -70,6 +70,30 @@ defmodule Wavex.FormatChunk do
     end
   end
 
+  @doc ~S"""
+  Read a format chunk.
+
+  ## Examples
+
+  From [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/):
+
+      iex> Wavex.FormatChunk.read(<<0x0066, 0x006d, 0x0074, 0x0020,
+      ...>                          0x0010, 0x0000, 0x0000, 0x0000,
+      ...>                          0x0001, 0x0000, 0x0002, 0x0000,
+      ...>                          0x0022, 0x0056, 0x0000, 0x0000,
+      ...>                          0x0088, 0x0058, 0x0001, 0x0000,
+      ...>                          0x0004, 0x0000, 0x0010, 0x0000>>)
+      {:ok,
+      %Wavex.FormatChunk{
+        bits_per_sample: 16,
+        block_align: 4,
+        byte_rate: 88200,
+        channels: 2,
+        sample_rate: 22050
+      }, ""}
+
+  """
+
   @spec read(binary) :: {:ok, t, binary} | {:error, binary}
   def read(binary) when is_binary(binary) do
     with {:ok, etc} <- Utils.read_id(binary, "fmt "),
