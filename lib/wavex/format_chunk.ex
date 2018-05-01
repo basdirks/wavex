@@ -1,11 +1,19 @@
 defmodule Wavex.FormatChunk do
-  @moduledoc false
+  @moduledoc """
+  Read a format chunk.
+  """
 
   alias Wavex.Utils
 
   defstruct [:channels, :sample_rate, :byte_rate, :block_align, :bits_per_sample]
 
-  @type t :: %__MODULE__{}
+  @type t :: %__MODULE__{
+          channels: pos_integer,
+          sample_rate: pos_integer,
+          byte_rate: pos_integer,
+          block_align: pos_integer,
+          bits_per_sample: pos_integer
+        }
 
   @spec read_size(binary) :: {:ok | :error, binary}
   defp read_size(<<size::32-little, etc::binary>>) do
@@ -15,11 +23,21 @@ defmodule Wavex.FormatChunk do
     end
   end
 
+  @spec format_name(non_neg_integer) :: binary
+  defp format_name(format) do
+    case format do
+      0x0002 -> "ADPCM"
+      0x0003 -> "IEEE_FLOAT"
+      0xFFFE -> "EXTENSIBLE"
+      _ -> "UNKNOWN"
+    end
+  end
+
   @spec read_format(binary) :: {:ok | :error, binary}
   defp read_format(<<format::16-little, etc::binary>>) do
     case format do
       1 -> {:ok, etc}
-      _ -> {:error, "expected format 1 (PCM), got: #{format}"}
+      _ -> {:error, "expected format 1 (PCM), got: #{format} (#{format_name(format)})"}
     end
   end
 
