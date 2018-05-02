@@ -6,26 +6,31 @@ defmodule Wavex.MixProject do
       app: :wavex,
       version: "0.1.0",
       elixir: "~> 1.6",
+      description: "Read WAV PCM files",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      extra_applications: [:logger]
-    ]
+    []
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["Apache 2"],
+      links: [github: "https://github.com/basdirks/wavex"],
+      maintainers: ["Bas Dirks"],
+      name: "wavex"
     ]
   end
 end
