@@ -315,14 +315,29 @@ defmodule Wavex.FormatChunk do
   defp verify_channels(0), do: {:error, "expected channels > 0"}
   defp verify_channels(_), do: :ok
 
+  @doc ~S"""
+  Validate a format chunk.
+
+  ## Examples
+
+      iex> Wavex.FormatChunk.validate(%Wavex.FormatChunk{
+      ...>   bits_per_sample: 16,
+      ...>   block_align: 4,
+      ...>   byte_rate: 88_200,
+      ...>   channels: 2,
+      ...>   sample_rate: 22_050
+      ...> })
+      :ok
+
+  """
   @spec validate(t) :: :ok | {:error, binary}
-  defp validate(%__MODULE__{
-         bits_per_sample: bits_per_sample,
-         block_align: block_align,
-         byte_rate: byte_rate,
-         channels: channels,
-         sample_rate: sample_rate
-       }) do
+  def validate(%__MODULE__{
+        bits_per_sample: bits_per_sample,
+        block_align: block_align,
+        byte_rate: byte_rate,
+        channels: channels,
+        sample_rate: sample_rate
+      }) do
     with :ok <- verify_channels(channels),
          :ok <- verify_bits_per_sample(bits_per_sample),
          :ok <- Utils.verify("block align", channels * div(bits_per_sample, 8), block_align),
@@ -358,9 +373,9 @@ defmodule Wavex.FormatChunk do
       %Wavex.FormatChunk{
         bits_per_sample: 16,
         block_align: 4,
-        byte_rate: 88200,
+        byte_rate: 88_200,
         channels: 2,
-        sample_rate: 22050
+        sample_rate: 22_050
       }, ""}
 
   """
