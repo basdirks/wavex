@@ -4,7 +4,7 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.6",
       description: "Read WAV PCM files",
       start_permanent: Mix.env() == :prod,
@@ -28,7 +28,7 @@ defmodule Wavex.MixProject do
   defp package do
     [
       licenses: ["Apache 2"],
-      links: [github: "https://github.com/basdirks/wavex"],
+      links: %{"GitHub" => "https://github.com/basdirks/wavex"},
       maintainers: ["Bas Dirks"],
       name: "wavex"
     ]
