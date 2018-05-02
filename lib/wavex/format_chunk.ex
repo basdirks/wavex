@@ -356,18 +356,12 @@ defmodule Wavex.FormatChunk do
   [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/)
 
       iex Wavex.FormatChunk.read(<<
-      ...> # f     m     t     \s
-      ...>   0x66, 0x6d, 0x74, 0x20,
-      ...> # 16
-      ...>   0x10, 0x00, 0x00, 0x00,
-      ...> # 1           2
-      ...>   0x01, 0x00, 0x02, 0x00,
-      ...> # 22050
-      ...>   0x22, 0x56, 0x00, 0x00,
-      ...> # 88200
-      ...>   0x88, 0x58, 0x01, 0x00,
-      ...> # 4           16
-      ...>   0x04, 0x00, 0x10, 0x00,
+      ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
+      ...>   0x10, 0x00, 0x00, 0x00, #  16
+      ...>   0x01, 0x00, 0x02, 0x00, #  1           2
+      ...>   0x22, 0x56, 0x00, 0x00, #  22050
+      ...>   0x88, 0x58, 0x01, 0x00, #  88200
+      ...>   0x04, 0x00, 0x10, 0x00  #  4           16
       ...> >>)
       {:ok,
       %Wavex.FormatChunk{
@@ -385,11 +379,14 @@ defmodule Wavex.FormatChunk do
     with {:ok, etc} <- Utils.read_id(binary, "fmt "),
          {:ok, etc} <- read_size(etc),
          {:ok, etc} <- read_format(etc),
-         <<channels::16-little, etc::binary>> <- etc,
-         <<sample_rate::32-little, etc::binary>> <- etc,
-         <<byte_rate::32-little, etc::binary>> <- etc,
-         <<block_align::16-little, etc::binary>> <- etc,
-         <<bits_per_sample::16-little, etc::binary>> <- etc,
+         <<
+           channels::16-little,
+           sample_rate::32-little,
+           byte_rate::32-little,
+           block_align::16-little,
+           bits_per_sample::16-little,
+           etc::binary
+         >> <- etc,
          module <- %__MODULE__{
            bits_per_sample: bits_per_sample,
            block_align: block_align,

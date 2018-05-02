@@ -17,12 +17,9 @@ defmodule Wavex.RIFFHeader do
   [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/)
 
       iex> Wavex.RIFFHeader.read(<<
-      ...> # R     I     F     F
-      ...>   0x52, 0x49, 0x46, 0x46,
-      ...> # 38
-      ...>   0x24, 0x08, 0x00, 0x00,
-      ...> # W     A     V     E
-      ...>   0x57, 0x41, 0x56, 0x45
+      ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
+      ...>   0x24, 0x08, 0x00, 0x00, #  38
+      ...>   0x57, 0x41, 0x56, 0x45  #  W     A     V     E
       ...> >>)
       {:ok, %Wavex.RIFFHeader{size: 2084}, ""}
 
