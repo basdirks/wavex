@@ -15,7 +15,7 @@ defmodule Wavex.FormatChunk do
   defstruct [:channels, :sample_rate, :byte_rate, :block_align, :bits_per_sample]
 
   @unexpected_bits_per_sample &"expected bits per sample to be 8, 16, or 24, got: #{&1}"
-  @unexpected_format &"expected format 1 (PCM), got: #{format} (#{Map.get(@formats, &1)})"
+  @unexpected_format &"expected format 1 (PCM), got: #{&1} (#{Map.get(@formats, &1)})"
   @unexpected_format_size &"expected format size 16, got: #{&1}"
   @unexpected_channels "expected channels > 0"
   @unexpected_EOF "unexpected EOF"
