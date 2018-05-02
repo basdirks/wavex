@@ -329,6 +329,56 @@ defmodule Wavex.FormatChunk do
       ...> })
       :ok
 
+  `channels` must be greater than `0`. The next example gives an error because
+  `channels` is `0`.
+
+      iex> Wavex.FormatChunk.validate(%Wavex.FormatChunk{
+      ...>   bits_per_sample: 16,
+      ...>   block_align: 4,
+      ...>   byte_rate: 88_200,
+      ...>   channels: 0,
+      ...>   sample_rate: 22_050
+      ...> })
+      {:error, "expected channels > 0"}
+
+  `bits_per_sample` must be equal to `8`, `16`, or `24`. The following example
+  gives an error because `bits_per_sample` is `32`.
+
+      iex> Wavex.FormatChunk.validate(%Wavex.FormatChunk{
+      ...>   bits_per_sample: 32,
+      ...>   block_align: 4,
+      ...>   byte_rate: 88_200,
+      ...>   channels: 2,
+      ...>   sample_rate: 22_050
+      ...> })
+      {:error, "expected bits per sample to be 8, 16, or 24, got: 32"}
+
+  `block_align` must be equal to `channels * bits_per_sample / 8`. The
+  following example gives an error because `block_align` is `4` instead of
+  `2 * 8 / 8 = 2`.
+
+      iex> Wavex.FormatChunk.validate(%Wavex.FormatChunk{
+      ...>   bits_per_sample: 8,
+      ...>   block_align: 4,
+      ...>   byte_rate: 88_200,
+      ...>   channels: 2,
+      ...>   sample_rate: 22_050
+      ...> })
+      {:error, "expected block align '2', got: '4'"}
+
+  `byte_rate` must be equal to `sample_rate * block_align`. The following
+  example gives an error because `byte_rate` is `88200` instead of
+  `22050 * 2 = 44100`.
+
+      iex> Wavex.FormatChunk.validate(%Wavex.FormatChunk{
+      ...>   bits_per_sample: 8,
+      ...>   block_align: 2,
+      ...>   byte_rate: 88_200,
+      ...>   channels: 2,
+      ...>   sample_rate: 22_050
+      ...> })
+      {:error, "expected byte rate '44100', got: '88200'"}
+
   """
   @spec validate(t) :: :ok | {:error, binary}
   def validate(%__MODULE__{
