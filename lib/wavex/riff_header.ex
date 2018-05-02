@@ -7,6 +7,8 @@ defmodule Wavex.RIFFHeader do
 
   defstruct [:size]
 
+  @unexpected_EOF "unexpected EOF"
+
   @type t :: %__MODULE__{size: pos_integer}
 
   @doc ~S"""
@@ -34,7 +36,7 @@ defmodule Wavex.RIFFHeader do
          {:ok, etc} <- Utils.read_id(etc, "WAVE") do
       {:ok, %__MODULE__{size: size}, etc}
     else
-      value when is_binary(value) -> {:error, "unexpected EOF"}
+      value when is_binary(value) -> {:error, @unexpected_EOF}
       error -> error
     end
   end

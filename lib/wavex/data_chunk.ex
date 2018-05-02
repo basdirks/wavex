@@ -7,6 +7,8 @@ defmodule Wavex.DataChunk do
 
   defstruct [:size, :data]
 
+  @unexpected_EOF "unexpected EOF"
+
   @type t :: %__MODULE__{size: non_neg_integer, data: binary}
 
   @doc ~S"""
@@ -33,7 +35,7 @@ defmodule Wavex.DataChunk do
          <<data::binary-size(bytes), _::binary>> <- etc do
       {:ok, %__MODULE__{size: size, data: data}}
     else
-      etc when is_binary(etc) -> {:error, "unexpected EOF"}
+      etc when is_binary(etc) -> {:error, @unexpected_EOF}
       error -> error
     end
   end

@@ -14,6 +14,12 @@ defmodule Wavex.FormatChunk do
 
   defstruct [:channels, :sample_rate, :byte_rate, :block_align, :bits_per_sample]
 
+  @unexpected_bits_per_sample &"expected bits per sample to be 8, 16, or 24, got: #{&1}"
+  @unexpected_format &"expected format 1 (PCM), got: #{format} (#{Map.get(@formats, &1)})"
+  @unexpected_format_size &"expected format size 16, got: #{&1}"
+  @unexpected_channels "expected channels > 0"
+  @unexpected_EOF "unexpected EOF"
+
   @type t :: %__MODULE__{
           channels: pos_integer,
           sample_rate: pos_integer,
@@ -292,7 +298,7 @@ defmodule Wavex.FormatChunk do
   defp read_size(<<size::32-little, etc::binary>>) do
     case size do
       16 -> {:ok, etc}
-      _ -> {:error, "expected format size 16, got: #{size}"}
+      _ -> {:error, @unexpected_format_size.(size)}
     end
   end
 
@@ -300,7 +306,7 @@ defmodule Wavex.FormatChunk do
   defp read_format(<<format::16-little, etc::binary>>) do
     case format do
       1 -> {:ok, etc}
-      _ -> {:error, "expected format 1 (PCM), got: #{format} (#{Map.get(@formats, format)})"}
+      _ -> {:error, @unexpected_format.(format)}
     end
   end
 
@@ -308,11 +314,11 @@ defmodule Wavex.FormatChunk do
   defp verify_bits_per_sample(bits_per_sample) when bits_per_sample in [8, 16, 24], do: :ok
 
   defp verify_bits_per_sample(bits_per_sample) do
-    {:error, "expected bits per sample to be 8, 16, or 24, got: #{bits_per_sample}"}
+    {:error, @unexpected_bits_per_sample.(bits_per_sample)}
   end
 
   @spec verify_channels(non_neg_integer) :: :ok | {:error, binary}
-  defp verify_channels(0), do: {:error, "expected channels > 0"}
+  defp verify_channels(0), do: {:error, @unexpected_channels}
   defp verify_channels(_), do: :ok
 
   @doc ~S"""
@@ -423,7 +429,6 @@ defmodule Wavex.FormatChunk do
       }, ""}
 
   """
-
   @spec read(binary) :: {:ok, t, binary} | {:error, binary}
   def read(binary) when is_binary(binary) do
     with {:ok, etc} <- Utils.read_id(binary, "fmt "),
@@ -447,7 +452,7 @@ defmodule Wavex.FormatChunk do
          :ok <- validate(module) do
       {:ok, module, etc}
     else
-      etc when is_binary(etc) -> {:error, "unexpected EOF"}
+      etc when is_binary(etc) -> {:error, @unexpected_EOF}
       error -> error
     end
   end
