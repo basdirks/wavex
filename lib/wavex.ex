@@ -57,9 +57,9 @@ defmodule Wavex do
         format_chunk: %Wavex.FormatChunk{
           bits_per_sample: 16,
           block_align: 4,
-          byte_rate: 88200,
+          byte_rate: 88_200,
           channels: 2,
-          sample_rate: 22050
+          sample_rate: 22_050
         },
         riff_header: %Wavex.RIFFHeader{size: 2084}
       }}
