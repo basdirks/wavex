@@ -33,8 +33,9 @@ defmodule Wavex.DataChunk do
   def read(binary, block_align) do
     with {:ok, etc} <- Utils.read_id(binary, "data"),
          <<size::32-little, etc::binary>> <- etc,
-         :ok <- Utils.verify("data length", String.length(etc), size * block_align) do
-      {:ok, %__MODULE__{size: size, data: etc}}
+         bytes <- size * block_align,
+         <<data::binary-size(bytes), _::binary>> <- etc do
+      {:ok, %__MODULE__{size: size, data: data}}
     else
       etc when is_binary(etc) -> {:error, "unexpected EOF"}
       error -> error
