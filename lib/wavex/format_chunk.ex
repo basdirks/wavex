@@ -1,13 +1,6 @@
 defmodule Wavex.FormatChunk do
   @moduledoc """
   Reading a format chunk.
-
-  `@formats` were taken from [
-    github.com/tpn, 2018-05-01, winddk-8.1 / Include / shared / mmreg.h
-  ](
-    https://github.com/tpn/winddk-8.1/blob/master/Include/shared/mmreg.h]
-  )
-
   """
 
   alias Wavex.Utils
@@ -24,6 +17,9 @@ defmodule Wavex.FormatChunk do
 
   @unexpected_channels "expected channels > 0"
   @unexpected_EOF "unexpected EOF"
+
+  # `@formats` were taken from github.com/tpn, 2018-05-01, winddk-8.1 / Include / shared / mmreg.h.
+  # https://github.com/tpn/winddk-8.1/blob/master/Include/shared/mmreg.h
 
   @formats %{
     0x0000 => "UNKNOWN",
