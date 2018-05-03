@@ -291,14 +291,17 @@ defmodule Wavex.FormatChunk do
     0xF1AC => "FLAC"
   }
 
+  @spec unexpected_bits_per_sample(non_neg_integer) :: binary
   defp unexpected_bits_per_sample(actual_bits_per_sample) do
     "expected bits per sample to be 8, 16, or 24, got: #{actual_bits_per_sample}"
   end
 
+  @spec unexpected_format(non_neg_integer) :: binary
   defp unexpected_format(actual_format) do
     "expected format 1 (PCM), got: #{actual_format} (#{Map.get(@formats, actual_format)})"
   end
 
+  @spec unexpected_format_size(non_neg_integer) :: binary
   defp unexpected_format_size(actual_format_size) do
     "expected format size 16, got: #{actual_format_size}"
   end
