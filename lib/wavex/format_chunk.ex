@@ -14,12 +14,6 @@ defmodule Wavex.FormatChunk do
 
   defstruct [:channels, :sample_rate, :byte_rate, :block_align, :bits_per_sample]
 
-  @unexpected_bits_per_sample &"expected bits per sample to be 8, 16, or 24, got: #{&1}"
-  @unexpected_format &"expected format 1 (PCM), got: #{&1} (#{Map.get(@formats, &1)})"
-  @unexpected_format_size &"expected format size 16, got: #{&1}"
-  @unexpected_channels "expected channels > 0"
-  @unexpected_EOF "unexpected EOF"
-
   @type t :: %__MODULE__{
           channels: pos_integer,
           sample_rate: pos_integer,
@@ -27,6 +21,9 @@ defmodule Wavex.FormatChunk do
           block_align: pos_integer,
           bits_per_sample: pos_integer
         }
+
+  @unexpected_channels "expected channels > 0"
+  @unexpected_EOF "unexpected EOF"
 
   @formats %{
     0x0000 => "UNKNOWN",
@@ -294,11 +291,23 @@ defmodule Wavex.FormatChunk do
     0xF1AC => "FLAC"
   }
 
+  defp unexpected_bits_per_sample(actual_bits_per_sample) do
+    "expected bits per sample to be 8, 16, or 24, got: #{actual_bits_per_sample}"
+  end
+
+  defp unexpected_format(actual_format) do
+    "expected format 1 (PCM), got: #{actual_format} (#{Map.get(@formats, actual_format)})"
+  end
+
+  defp unexpected_format_size(actual_format_size) do
+    "expected format size 16, got: #{actual_format_size}"
+  end
+
   @spec read_size(binary) :: {:ok | :error, binary}
   defp read_size(<<size::32-little, etc::binary>>) do
     case size do
       16 -> {:ok, etc}
-      _ -> {:error, @unexpected_format_size.(size)}
+      _ -> {:error, unexpected_format_size(size)}
     end
   end
 
@@ -306,7 +315,7 @@ defmodule Wavex.FormatChunk do
   defp read_format(<<format::16-little, etc::binary>>) do
     case format do
       1 -> {:ok, etc}
-      _ -> {:error, @unexpected_format.(format)}
+      _ -> {:error, unexpected_format(format)}
     end
   end
 
@@ -314,7 +323,7 @@ defmodule Wavex.FormatChunk do
   defp verify_bits_per_sample(bits_per_sample) when bits_per_sample in [8, 16, 24], do: :ok
 
   defp verify_bits_per_sample(bits_per_sample) do
-    {:error, @unexpected_bits_per_sample.(bits_per_sample)}
+    {:error, unexpected_bits_per_sample(bits_per_sample)}
   end
 
   @spec verify_channels(non_neg_integer) :: :ok | {:error, binary}
