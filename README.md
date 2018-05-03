@@ -1,11 +1,14 @@
 # Wavex
 
-Read and write WAVE files and data.
+[![Hex.pm](https://img.shields.io/hexpm/v/wavex.svg?style=flat-square)](https://hex.pm/packages/wavex)
+
+Read .WAVE files.
+
+Currently only the PCM format is supported.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `wavex` to your list of dependencies in `mix.exs`:
+1.  Add `wavex` to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
@@ -15,7 +18,12 @@ def deps do
 end
 ```
 
+2.  Update your dependencies:
+
+```elixir
+$ mix deps.get
+```
+
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/wavex](https://hexdocs.pm/wavex).
-
