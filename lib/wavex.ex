@@ -5,6 +5,17 @@ defmodule Wavex do
 
   alias Wavex.{DataChunk, FormatChunk, RIFFHeader}
 
+  alias Wavex.Error.{
+    BlockAlignMismatch,
+    ByteRateMismatch,
+    UnexpectedEOF,
+    UnexpectedFormatSize,
+    UnexpectedID,
+    UnsupportedBitsPerSample,
+    UnsupportedFormat,
+    ZeroChannels
+  }
+
   defstruct [:riff_header, :format_chunk, :data_chunk]
 
   @type t :: %__MODULE__{
@@ -79,7 +90,17 @@ defmodule Wavex do
         }}
 
   """
-  @spec read(binary) :: {:ok, t} | {:error, binary}
+  @spec read(binary) ::
+          {:ok, t}
+          | {:error,
+             BlockAlignMismatch.t()
+             | ByteRateMismatch.t()
+             | UnexpectedEOF.t()
+             | UnexpectedFormatSize.t()
+             | UnexpectedID.t()
+             | UnsupportedBitsPerSample.t()
+             | UnsupportedFormat.t()
+             | ZeroChannels.t()}
   def read(binary) when is_binary(binary) do
     with {:ok, %RIFFHeader{} = riff_header, etc} <- RIFFHeader.read(binary),
          {:ok, %FormatChunk{block_align: block_align} = format_chunk, etc} <-
@@ -87,7 +108,7 @@ defmodule Wavex do
          {:ok, %DataChunk{} = data_chunk} <- DataChunk.read(etc, block_align) do
       {:ok, %Wavex{riff_header: riff_header, format_chunk: format_chunk, data_chunk: data_chunk}}
     else
-      error -> error
+      {:error, _} = error -> error
     end
   end
 end

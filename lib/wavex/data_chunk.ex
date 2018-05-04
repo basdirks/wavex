@@ -3,11 +3,10 @@ defmodule Wavex.DataChunk do
   Reading a data chunk.
   """
 
+  alias Wavex.Error.{UnexpectedEOF, UnexpectedID}
   alias Wavex.Utils
 
   defstruct [:size, :data]
-
-  @unexpected_EOF "unexpected EOF"
 
   @type t :: %__MODULE__{size: non_neg_integer, data: binary}
 
@@ -27,7 +26,7 @@ defmodule Wavex.DataChunk do
       {:ok, %Wavex.DataChunk{size: 2, data: <<0, 0, 0, 0, 0, 0, 0, 0>>}}
 
   """
-  @spec read(binary, non_neg_integer) :: {:ok, t} | {:error, binary}
+  @spec read(binary, non_neg_integer) :: {:ok, t} | {:error, UnexpectedEOF.t() | UnexpectedID.t()}
   def read(binary, block_align) do
     with {:ok, etc} <- Utils.read_id(binary, "data"),
          <<size::32-little, etc::binary>> <- etc,
@@ -35,7 +34,7 @@ defmodule Wavex.DataChunk do
          <<data::binary-size(bytes), _::binary>> <- etc do
       {:ok, %__MODULE__{size: size, data: data}}
     else
-      etc when is_binary(etc) -> {:error, @unexpected_EOF}
+      etc when is_binary(etc) -> {:error, %UnexpectedEOF{}}
       error -> error
     end
   end
