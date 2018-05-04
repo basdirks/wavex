@@ -3,18 +3,7 @@ defmodule Wavex do
   Reading PCM WAVE files.
   """
 
-  alias Wavex.{DataChunk, FormatChunk, RIFFHeader}
-
-  alias Wavex.Error.{
-    BlockAlignMismatch,
-    ByteRateMismatch,
-    UnexpectedEOF,
-    UnexpectedFormatSize,
-    UnexpectedID,
-    UnsupportedBitsPerSample,
-    UnsupportedFormat,
-    ZeroChannels
-  }
+  alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader}
 
   defstruct [:riff_header, :format_chunk, :data_chunk]
 
@@ -90,17 +79,7 @@ defmodule Wavex do
         }}
 
   """
-  @spec read(binary) ::
-          {:ok, t}
-          | {:error,
-             BlockAlignMismatch.t()
-             | ByteRateMismatch.t()
-             | UnexpectedEOF.t()
-             | UnexpectedFormatSize.t()
-             | UnexpectedID.t()
-             | UnsupportedBitsPerSample.t()
-             | UnsupportedFormat.t()
-             | ZeroChannels.t()}
+  @spec read(binary) :: {:ok, t} | {:error, Error.t()}
   def read(binary) when is_binary(binary) do
     with {:ok, %RIFFHeader{} = riff_header, etc} <- RIFFHeader.read(binary),
          {:ok, %FormatChunk{block_align: block_align} = format_chunk, etc} <-

@@ -3,6 +3,27 @@ defmodule Wavex.Error do
   WAVE processing errors
   """
 
+  alias __MODULE__.{
+    BlockAlignMismatch,
+    ByteRateMismatch,
+    UnexpectedEOF,
+    UnexpectedFormatSize,
+    UnexpectedID,
+    UnsupportedBitsPerSample,
+    UnsupportedFormat,
+    ZeroChannels
+  }
+
+  @type t ::
+          BlockAlignMismatch.t()
+          | ByteRateMismatch.t()
+          | UnexpectedEOF.t()
+          | UnexpectedFormatSize.t()
+          | UnexpectedID.t()
+          | UnsupportedBitsPerSample.t()
+          | UnsupportedFormat.t()
+          | ZeroChannels.t()
+
   defmodule UnsupportedFormat do
     @moduledoc """
     An unsupported format. Currently, only 0x0001 (PCM) is supported.
