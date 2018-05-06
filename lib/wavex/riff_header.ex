@@ -2,7 +2,7 @@ defmodule Wavex.RIFFHeader do
   @moduledoc """
   Reading a RIFF header.
 
-  The RIFF header is the first chunk in a WAV file, and normally consists of:
+  The RIFF header is the first chunk in a WAVE file, and normally consists of:
 
   - the `"RIFF"` identifier,
   - the file size,

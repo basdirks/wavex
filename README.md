@@ -2,7 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/v/wavex.svg?style=flat-square)](https://hex.pm/packages/wavex)
 
-Read PCM WAV files.
+Read PCM WAVE files.
 
 ## Installation
 

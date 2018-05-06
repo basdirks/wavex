@@ -164,7 +164,8 @@ defmodule Wavex.FormatChunk do
   end
 
   @doc ~S"""
-  Read a format chunk.
+  Read a validates a format chunk. See also `Wavex.FormatChunk.validate/1` to
+  find out what is validated.
 
   ## Examples
 
