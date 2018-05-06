@@ -1,6 +1,6 @@
 defmodule Wavex.Utils do
   @moduledoc """
-  Reading binary data.
+  Miscellaneous utilities.
   """
 
   alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
