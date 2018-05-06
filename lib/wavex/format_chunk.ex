@@ -55,16 +55,16 @@ defmodule Wavex.FormatChunk do
 
   @spec verify_block_align(non_neg_integer, non_neg_integer) ::
           :ok | {:error, BlockAlignMismatch.t()}
-  def verify_block_align(block_align, block_align), do: :ok
+  defp verify_block_align(block_align, block_align), do: :ok
 
-  def verify_block_align(expected_block_align, actual_block_align) do
+  defp verify_block_align(expected_block_align, actual_block_align) do
     {:error, %BlockAlignMismatch{expected: expected_block_align, actual: actual_block_align}}
   end
 
   @spec verify_byte_rate(non_neg_integer, non_neg_integer) :: :ok | {:error, ByteRateMismatch.t()}
-  def verify_byte_rate(block_align, block_align), do: :ok
+  defp verify_byte_rate(block_align, block_align), do: :ok
 
-  def verify_byte_rate(expected_byte_rate, actual_byte_rate) do
+  defp verify_byte_rate(expected_byte_rate, actual_byte_rate) do
     {:error, %ByteRateMismatch{expected: expected_byte_rate, actual: actual_byte_rate}}
   end
 
