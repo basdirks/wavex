@@ -1,6 +1,6 @@
 defmodule Wavex do
   @moduledoc """
-  Reading a PCM WAVE file.
+  Read PCM WAVE data.
   """
 
   alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader}
@@ -14,7 +14,7 @@ defmodule Wavex do
         }
 
   @doc ~S"""
-  Read a PCM WAVE file.
+  Read PCM WAVE data.
 
   ## Examples
       
