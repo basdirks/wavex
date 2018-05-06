@@ -4,7 +4,7 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.2.15",
+      version: "0.2.16",
       elixir: "~> 1.6",
       description: "Read WAVE PCM data",
       start_permanent: Mix.env() == :prod,
