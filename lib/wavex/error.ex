@@ -8,7 +8,7 @@ defmodule Wavex.Error do
     ByteRateMismatch,
     UnexpectedEOF,
     UnexpectedFormatSize,
-    UnexpectedID,
+    UnexpectedFourCC,
     UnsupportedBitsPerSample,
     UnsupportedFormat,
     ZeroChannels
@@ -19,7 +19,7 @@ defmodule Wavex.Error do
           | ByteRateMismatch.t()
           | UnexpectedEOF.t()
           | UnexpectedFormatSize.t()
-          | UnexpectedID.t()
+          | UnexpectedFourCC.t()
           | UnsupportedBitsPerSample.t()
           | UnsupportedFormat.t()
           | ZeroChannels.t()
@@ -401,9 +401,9 @@ defmodule Wavex.Error do
     end
   end
 
-  defmodule UnexpectedID do
+  defmodule UnexpectedFourCC do
     @moduledoc """
-    An unexpected chunk id.
+    An unexpected four character code.
     """
 
     defstruct [:expected, :actual]
@@ -411,8 +411,8 @@ defmodule Wavex.Error do
     @type t :: %__MODULE__{expected: binary, actual: binary}
 
     defimpl String.Chars, for: __MODULE__ do
-      def to_string(%UnexpectedID{expected: expected, actual: actual}) do
-        "expected identifier '#{expected}', got: '#{actual}'"
+      def to_string(%UnexpectedFourCC{expected: expected, actual: actual}) do
+        "expected FourCC '#{expected}', got: '#{actual}'"
       end
     end
   end

@@ -4,13 +4,13 @@ defmodule Wavex.DataChunk do
 
   A data chunk normally contains:
 
-  - a `"data"` identifier,
+  - a `"data"` FourCC,
   - the size of the actual audio data,
   - the actual audio data.
 
   """
 
-  alias Wavex.Error.{UnexpectedEOF, UnexpectedID}
+  alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
   alias Wavex.Utils
 
   defstruct [:size, :data]
@@ -31,7 +31,8 @@ defmodule Wavex.DataChunk do
       {:ok, %Wavex.DataChunk{size: 2, data: <<0, 0, 0, 0, 0, 0, 0, 0>>}}
 
   """
-  @spec read(binary, non_neg_integer) :: {:ok, t} | {:error, UnexpectedEOF.t() | UnexpectedID.t()}
+  @spec read(binary, non_neg_integer) ::
+          {:ok, t} | {:error, UnexpectedEOF.t() | UnexpectedFourCC.t()}
   def read(binary, block_align)
       when is_binary(binary) and is_integer(block_align) and block_align > 0 do
     with {:ok, etc} <- Utils.read_fourCC(binary, "data"),

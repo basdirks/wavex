@@ -3,17 +3,17 @@ defmodule Wavex.Utils do
   Reading binary data.
   """
 
-  alias Wavex.Error.{UnexpectedEOF, UnexpectedID}
+  alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
 
   @doc """
-  Read a four character code.
+  Read a FourCC (four character code).
   """
   @spec read_fourCC(binary, binary) ::
-          {:ok, binary} | {:error, UnexpectedID.t() | UnexpectedEOF.t()}
-  def read_fourCC(<<id::binary-size(4), etc::binary>>, expected_id) do
-    case id do
-      ^expected_id -> {:ok, etc}
-      _ -> {:error, %UnexpectedID{expected: expected_id, actual: id}}
+          {:ok, binary} | {:error, UnexpectedFourCC.t() | UnexpectedEOF.t()}
+  def read_fourCC(<<code::binary-size(4), etc::binary>>, expected_code) do
+    case code do
+      ^expected_code -> {:ok, etc}
+      _ -> {:error, %UnexpectedFourCC{expected: expected_code, actual: code}}
     end
   end
 

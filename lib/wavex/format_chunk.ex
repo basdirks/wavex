@@ -4,7 +4,7 @@ defmodule Wavex.FormatChunk do
 
   A format chunk normally contains information about the data that follows:
 
-  - a `"fmt "` identifier,
+  - a `"fmt "` FourCC,
   - a format size,
   - a format,
   - the number of channels,
@@ -22,7 +22,7 @@ defmodule Wavex.FormatChunk do
     ByteRateMismatch,
     UnexpectedEOF,
     UnexpectedFormatSize,
-    UnexpectedID,
+    UnexpectedFourCC,
     UnsupportedBitsPerSample,
     UnsupportedFormat,
     ZeroChannels
@@ -194,7 +194,7 @@ defmodule Wavex.FormatChunk do
              | ByteRateMismatch.t()
              | UnexpectedEOF.t()
              | UnexpectedFormatSize.t()
-             | UnexpectedID.t()
+             | UnexpectedFourCC.t()
              | UnsupportedBitsPerSample.t()
              | UnsupportedFormat.t()
              | ZeroChannels.t()}
