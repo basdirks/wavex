@@ -24,17 +24,22 @@ defmodule Wavex.RIFFHeader do
       ...> >>)
       {:ok, %Wavex.RIFFHeader{size: 2084}, ""}
 
-  Bytes 1-4 must read "RIFF" to indicate the Resource Interchange File Format.
-  Reading a different format returns an error.
+  Bytes 1-4 must read `"RIFF"` to indicate the Resource Interchange File Format.
+  Reading a different id returns an error.
 
       iex> Wavex.RIFFHeader.read(<<"RIFX", 0, 0, 0, 0, "WAVE">>)
       {:error, %Wavex.Error.UnexpectedID{expected: "RIFF", actual: "RIFX"}}
 
-  Bytes 5-8 must read "WAVE" to indicate a waveform audio file. Reading a
-  different format returns an error.
+  Bytes 5-8 must read `"WAVE"` to indicate a waveform audio file. Reading a
+  different id returns an error.
 
       iex> Wavex.RIFFHeader.read(<<"RIFF", 0, 0, 0, 0, "AVI ">>)
       {:error, %Wavex.Error.UnexpectedID{expected: "WAVE", actual: "AVI "}}
+
+  A binary must be at least 12 bytes to contain a RIFF header.
+
+      iex> Wavex.RIFFHeader.read(<<"RIFF", 0, 0>>)
+      {:error, %Wavex.Error.UnexpectedEOF{}}
 
   """
   @spec read(binary) :: {:ok, t, binary} | {:error, UnexpectedEOF.t() | UnexpectedID.t()}
