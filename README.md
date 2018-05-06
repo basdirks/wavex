@@ -2,9 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/v/wavex.svg?style=flat-square)](https://hex.pm/packages/wavex)
 
-Read .WAVE files.
-
-Currently only the PCM format is supported.
+Read PCM WAV files.
 
 ## Installation
 

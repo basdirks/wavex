@@ -371,7 +371,7 @@ defmodule Wavex.Error do
 
   defmodule BlockAlignMismatch do
     @moduledoc """
-    An mismatched block align value.
+    A mismatched block align value.
     """
 
     defstruct [:expected, :actual]
@@ -387,7 +387,7 @@ defmodule Wavex.Error do
 
   defmodule ByteRateMismatch do
     @moduledoc """
-    An mismatched byte rate value.
+    A mismatched byte rate value.
     """
 
     defstruct [:expected, :actual]
