@@ -19,7 +19,7 @@ defmodule Wavex.RIFFHeader do
 
       iex> Wavex.RIFFHeader.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
-      ...>   0x24, 0x08, 0x00, 0x00, #  38
+      ...>   0x24, 0x08, 0x00, 0x00, #  2084
       ...>   0x57, 0x41, 0x56, 0x45  #  W     A     V     E
       ...> >>)
       {:ok, %Wavex.RIFFHeader{size: 2084}, ""}
@@ -51,7 +51,7 @@ defmodule Wavex.RIFFHeader do
   """
 
   @spec read(binary) :: {:ok, t, binary} | {:error, UnexpectedEOF.t() | UnexpectedID.t()}
-  def read(binary) do
+  def read(binary) when is_binary(binary) do
     with {:ok, etc} <- Utils.read_id(binary, "RIFF"),
          <<size::32-little, etc::binary>> <- etc,
          {:ok, etc} <- Utils.read_id(etc, "WAVE") do

@@ -27,7 +27,8 @@ defmodule Wavex.DataChunk do
 
   """
   @spec read(binary, non_neg_integer) :: {:ok, t} | {:error, UnexpectedEOF.t() | UnexpectedID.t()}
-  def read(binary, block_align) do
+  def read(binary, block_align)
+      when is_binary(binary) and is_integer(block_align) and block_align > 0 do
     with {:ok, etc} <- Utils.read_id(binary, "data"),
          <<size::32-little, etc::binary>> <- etc,
          bytes <- size * block_align,
