@@ -30,6 +30,16 @@ defmodule Wavex.DataChunk do
       ...> >>, 4)
       {:ok, %Wavex.DataChunk{size: 2, data: <<0, 0, 0, 0, 0, 0, 0, 0>>}}
 
+  ## Caveat
+
+  ### "data" FourCC
+
+  Bytes 1-4 must read `"data"` to indicate a data chunk. A different value
+  results in an error.
+
+      iex> Wavex.DataChunk.read(<<"dat ", 2, 0, 0, 0, 0, 0, 0>>, 1)
+      {:error, %Wavex.Error.UnexpectedFourCC{expected: "data", actual: "dat "}}
+
   """
   @spec read(binary, non_neg_integer) ::
           {:ok, t} | {:error, UnexpectedEOF.t() | UnexpectedFourCC.t()}

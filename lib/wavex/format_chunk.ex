@@ -94,8 +94,10 @@ defmodule Wavex.FormatChunk do
       ...> })
       :ok
 
-  The number of `channels` must be positive. The next example gives an error
-  because `channels` is `0`.
+  ### Channels
+
+  The number of `channels` must be positive. The following example gives an
+  error because `channels` is `0`.
 
       iex> Wavex.FormatChunk.validate(%Wavex.FormatChunk{
       ...>   bits_per_sample: 16,
@@ -105,6 +107,8 @@ defmodule Wavex.FormatChunk do
       ...>   sample_rate: 22_050
       ...> })
       {:error, %Wavex.Error.ZeroChannels{}}
+
+  ### Bits per sample
 
   `bits_per_sample` must be equal to `8`, `16`, or `24`. The following example
   gives an error because `bits_per_sample` is `32`.
@@ -118,6 +122,8 @@ defmodule Wavex.FormatChunk do
       ...> })
       {:error, %Wavex.Error.UnsupportedBitsPerSample{bits_per_sample: 32}}
 
+  ### Block alignment
+
   `block_align` must be equal to `channels * bits_per_sample / 8`. The
   following example gives an error because `block_align` is `4` instead of
   `2 * 8 / 8 = 2`.
@@ -130,6 +136,8 @@ defmodule Wavex.FormatChunk do
       ...>   sample_rate: 22_050
       ...> })
       {:error, %Wavex.Error.BlockAlignMismatch{expected: 2, actual: 4}}
+
+  ### Byte rate
 
   `byte_rate` must be equal to `sample_rate * block_align`. The following
   example gives an error because `byte_rate` is `88200` instead of
@@ -164,8 +172,8 @@ defmodule Wavex.FormatChunk do
   end
 
   @doc ~S"""
-  Read a validates a format chunk. See also `Wavex.FormatChunk.validate/1` to
-  find out what is validated.
+  Read and validate a format chunk. See `Wavex.FormatChunk.validate/1` to see
+  what is validated.
 
   ## Examples
 
@@ -185,6 +193,61 @@ defmodule Wavex.FormatChunk do
         channels: 2,
         sample_rate: 22_050
       }, ""}
+
+  ## Caveats
+
+  ### "fmt " FourCC
+
+  Bytes 1-4 must read `"fmt "` to indicate a format chunk. A different value
+  results in an error. The following example gives an error because bytes 1-4
+  read `"data"` instead of `"fmt "`.
+
+      iex> Wavex.FormatChunk.read(<<
+      ...>   0x64, 0x61, 0x74, 0x61, #  d     a     t     a
+      ...>   0x10, 0x00, 0x00, 0x00, #  16
+      ...>   0x01, 0x00, 0x02, 0x00, #  1           2
+      ...>   0x22, 0x56, 0x00, 0x00, #  22050
+      ...>   0x88, 0x58, 0x01, 0x00, #  88200
+      ...>   0x04, 0x00, 0x10, 0x00  #  4           16
+      ...> >>)
+      {:error, %Wavex.Error.UnexpectedFourCC{expected: "fmt ", actual: "data"}}
+
+  ### Format size
+
+  The format size at bytes 5-8 is expected to be `16`, the default format size
+  for the PCM format. The following example gives an error because the format
+  size is `18` instead of `16`.
+
+      iex> Wavex.FormatChunk.read(<<
+      ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
+      ...>   0x12, 0x00, 0x00, 0x00, #  18
+      ...>   0x01, 0x00, 0x02, 0x00, #  1           2
+      ...>   0x22, 0x56, 0x00, 0x00, #  22050
+      ...>   0x88, 0x58, 0x01, 0x00, #  88200
+      ...>   0x04, 0x00, 0x10, 0x00  #  4           16
+      ...> >>)
+      {:error, %Wavex.Error.UnexpectedFormatSize{size: 18}}
+
+  ### Format size
+
+  The format at bytes 9-12 must be `0x0001` (PCM), as other formats are not
+  supported. The following example gives an error because the format is
+  `0x0032` instead of `0x0001`.
+
+      iex> Wavex.FormatChunk.read(<<
+      ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
+      ...>   0x10, 0x00, 0x00, 0x00, #  16
+      ...>   0x32, 0x00, 0x02, 0x00, #  50          2
+      ...>   0x22, 0x56, 0x00, 0x00, #  22050
+      ...>   0x88, 0x58, 0x01, 0x00, #  88200
+      ...>   0x04, 0x00, 0x10, 0x00  #  4           16
+      ...> >>)
+      {:error, %Wavex.Error.UnsupportedFormat{format: 0x0032}}
+
+  ### Internal consistency
+
+  The resulting `%Wavex.FormatChunk{}` is checked for internal consistency
+  with `Wavex.FormatChunk.validate/1`.
 
   """
   @spec read(binary) ::

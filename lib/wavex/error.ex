@@ -27,6 +27,13 @@ defmodule Wavex.Error do
   defmodule UnsupportedFormat do
     @moduledoc """
     An unsupported format. Currently, only 0x0001 (PCM) is supported.
+
+        iex> to_string(%Wavex.Error.UnsupportedFormat{format: 0x0000})
+        "expected format 1 (PCM), got: 0 (UNKNOWN)"
+
+        iex> to_string(%Wavex.Error.UnsupportedFormat{format: 0x0050})
+        "expected format 1 (PCM), got: 80 (MPEG)"
+
     """
 
     defstruct [:format]
@@ -312,6 +319,10 @@ defmodule Wavex.Error do
   defmodule UnexpectedFormatSize do
     @moduledoc """
     An unexpected format size. A format size of 16 is expected.
+
+        iex> to_string(%Wavex.Error.UnexpectedFormatSize{size: 18})
+        "expected format size 16, got: 18"
+
     """
 
     defstruct [:size]
@@ -329,6 +340,10 @@ defmodule Wavex.Error do
     @moduledoc """
     An unsupported bits per sample value. Currently, only values of 8, 16,
     and 24 are supported.
+
+        iex> to_string(%Wavex.Error.UnsupportedBitsPerSample{bits_per_sample: 32})
+        "expected bits per sample to be 8, 16, or 24, got: 32"
+
     """
 
     defstruct [:bits_per_sample]
@@ -363,6 +378,10 @@ defmodule Wavex.Error do
   defmodule UnexpectedEOF do
     @moduledoc """
     An unexpected end of file.
+
+        iex> to_string(%Wavex.Error.UnexpectedEOF{})
+        "expected more data, got an end of file"
+
     """
 
     defstruct []
@@ -370,13 +389,17 @@ defmodule Wavex.Error do
     @type t :: %__MODULE__{}
 
     defimpl String.Chars, for: __MODULE__ do
-      def to_string(_), do: "expected more data, got an end of file."
+      def to_string(_), do: "expected more data, got an end of file"
     end
   end
 
   defmodule BlockAlignMismatch do
     @moduledoc """
     A mismatched block align value.
+
+        iex> to_string(%Wavex.Error.BlockAlignMismatch{expected: 1, actual: 2})
+        "expected block align 1, got: 2"
+
     """
 
     defstruct [:expected, :actual]
@@ -385,7 +408,7 @@ defmodule Wavex.Error do
 
     defimpl String.Chars, for: __MODULE__ do
       def to_string(%BlockAlignMismatch{expected: expected, actual: actual}) do
-        "expected block align '#{expected}', got: '#{actual}'"
+        "expected block align #{expected}, got: #{actual}"
       end
     end
   end
@@ -393,6 +416,10 @@ defmodule Wavex.Error do
   defmodule ByteRateMismatch do
     @moduledoc """
     A mismatched byte rate value.
+
+        iex> to_string(%Wavex.Error.ByteRateMismatch{expected: 44_100, actual: 88_200})
+        "expected byte rate 44100, got: 88200"
+
     """
 
     defstruct [:expected, :actual]
@@ -401,14 +428,18 @@ defmodule Wavex.Error do
 
     defimpl String.Chars, for: __MODULE__ do
       def to_string(%ByteRateMismatch{expected: expected, actual: actual}) do
-        "expected byte rate '#{expected}', got: '#{actual}'"
+        "expected byte rate #{expected}, got: #{actual}"
       end
     end
   end
 
   defmodule UnexpectedFourCC do
-    @moduledoc """
+    @moduledoc ~S"""
     An unexpected four character code.
+
+        iex> to_string(%Wavex.Error.UnexpectedFourCC{expected: "WAVE", actual: "AVI "})
+        "expected FourCC \"WAVE\", got: \"AVI \""
+
     """
 
     defstruct [:expected, :actual]
@@ -417,7 +448,7 @@ defmodule Wavex.Error do
 
     defimpl String.Chars, for: __MODULE__ do
       def to_string(%UnexpectedFourCC{expected: expected, actual: actual}) do
-        "expected FourCC '#{expected}', got: '#{actual}'"
+        "expected FourCC \"#{expected}\", got: \"#{actual}\""
       end
     end
   end
