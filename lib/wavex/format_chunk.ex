@@ -199,7 +199,7 @@ defmodule Wavex.FormatChunk do
              | UnsupportedFormat.t()
              | ZeroChannels.t()}
   def read(binary) when is_binary(binary) do
-    with {:ok, etc} <- Utils.read_id(binary, "fmt "),
+    with {:ok, etc} <- Utils.read_fourCC(binary, "fmt "),
          {:ok, etc} <- read_size(etc),
          {:ok, etc} <- read_format(etc),
          <<

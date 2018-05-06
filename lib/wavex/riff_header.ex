@@ -57,9 +57,9 @@ defmodule Wavex.RIFFHeader do
 
   @spec read(binary) :: {:ok, t, binary} | {:error, UnexpectedEOF.t() | UnexpectedID.t()}
   def read(binary) when is_binary(binary) do
-    with {:ok, etc} <- Utils.read_id(binary, "RIFF"),
+    with {:ok, etc} <- Utils.read_fourCC(binary, "RIFF"),
          <<size::32-little, etc::binary>> <- etc,
-         {:ok, etc} <- Utils.read_id(etc, "WAVE") do
+         {:ok, etc} <- Utils.read_fourCC(etc, "WAVE") do
       {:ok, %__MODULE__{size: size}, etc}
     else
       value when is_binary(value) -> {:error, %UnexpectedEOF{}}
