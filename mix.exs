@@ -4,12 +4,14 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.2.14",
+      version: "0.2.15",
       elixir: "~> 1.6",
       description: "Read WAVE PCM data",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package()
+      package: package(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test]
     ]
   end
 
@@ -20,6 +22,7 @@ defmodule Wavex.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.8.2", only: :test},
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
     ]
