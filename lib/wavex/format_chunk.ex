@@ -1,6 +1,18 @@
 defmodule Wavex.FormatChunk do
   @moduledoc """
   Reading a format chunk.
+
+  A format chunk normally contains information about the data that follows:
+
+  - a `"fmt "` identifier,
+  - a format size,
+  - a format,
+  - the number of channels,
+  - a sample rate,
+  - a byte rate,
+  - block alignment,
+  - the bits per sample.
+
   """
 
   alias Wavex.Utils

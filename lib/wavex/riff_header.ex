@@ -1,6 +1,13 @@
 defmodule Wavex.RIFFHeader do
   @moduledoc """
   Reading a RIFF header.
+
+  The RIFF header is the first chunk in a WAV file, and normally consists of:
+
+  - the `"RIFF"` identifier,
+  - the file size,
+  - the `"WAVE"` identifier.
+
   """
 
   alias Wavex.Error.{UnexpectedEOF, UnexpectedID}

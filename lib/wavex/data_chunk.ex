@@ -1,6 +1,13 @@
 defmodule Wavex.DataChunk do
   @moduledoc """
   Reading a data chunk.
+
+  A data chunk normally contains:
+
+  - a `"data"` identifier,
+  - the size of the actual audio data,
+  - the actual audio data.
+
   """
 
   alias Wavex.Error.{UnexpectedEOF, UnexpectedID}
