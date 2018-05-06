@@ -327,7 +327,8 @@ defmodule Wavex.Error do
 
   defmodule UnsupportedBitsPerSample do
     @moduledoc """
-    An unsupported bits per sample value. Currently, only values of 8, 16, or 24 are supported.
+    An unsupported bits per sample value. Currently, only values of 8, 16,
+    and 24 are supported.
     """
 
     defstruct [:bits_per_sample]
@@ -344,6 +345,10 @@ defmodule Wavex.Error do
   defmodule ZeroChannels do
     @moduledoc """
     A channel value of 0. The number of channels must be positive.
+
+        iex> to_string(%Wavex.Error.ZeroChannels{})
+        "expected a positive number of channels"
+
     """
 
     defstruct []
