@@ -412,7 +412,7 @@ defmodule Wavex.Error do
 
     defimpl String.Chars, for: __MODULE__ do
       def to_string(%UnexpectedID{expected: expected, actual: actual}) do
-        "expected id '#{expected}', got: '#{actual}'"
+        "expected identifier '#{expected}', got: '#{actual}'"
       end
     end
   end

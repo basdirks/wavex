@@ -22,8 +22,6 @@ defmodule Wavex.RIFFHeader do
 
   ## Examples
 
-  [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/)
-
       iex> Wavex.RIFFHeader.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
       ...>   0x24, 0x08, 0x00, 0x00, #  2084
@@ -32,13 +30,13 @@ defmodule Wavex.RIFFHeader do
       {:ok, %Wavex.RIFFHeader{size: 2084}, ""}
 
   Bytes 1-4 must read `"RIFF"` to indicate the Resource Interchange File Format.
-  Reading a different id returns an error.
+  A different identifier results in an error.
 
       iex> Wavex.RIFFHeader.read(<<"RIFX", 0, 0, 0, 0, "WAVE">>)
       {:error, %Wavex.Error.UnexpectedID{expected: "RIFF", actual: "RIFX"}}
 
-  Bytes 9-12 must read `"WAVE"` to indicate a waveform audio file. Reading a
-  different id returns an error.
+  Bytes 9-12 must read `"WAVE"` to indicate a waveform audio file. A different
+  identifier results in an error.
 
       iex> Wavex.RIFFHeader.read(<<"RIFF", 0, 0, 0, 0, "AVI ">>)
       {:error, %Wavex.Error.UnexpectedID{expected: "WAVE", actual: "AVI "}}

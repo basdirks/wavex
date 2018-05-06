@@ -6,12 +6,13 @@ defmodule Wavex.Utils do
   alias Wavex.Error.{UnexpectedEOF, UnexpectedID}
 
   @doc """
-  Read a 4-byte id.
+  Read a FourCC.
   """
-  @spec read_id(binary, binary) :: {:ok, binary} | {:error, UnexpectedID.t() | UnexpectedEOF.t()}
-  def read_id(<<id::binary-size(4), etc::binary>>, expected_id) do
+  @spec read_fourCC(binary, binary) ::
+          {:ok, binary} | {:error, UnexpectedID.t() | UnexpectedEOF.t()}
+  def read_fourCC(<<id::binary-size(4), etc::binary>>, expected_id) do
     case id do
-      ^expected_id -> {:ok, etc}
+      ^expected_id -> {:ok, e(c)}
       _ -> {:error, %UnexpectedID{expected: expected_id, actual: id}}
     end
   end

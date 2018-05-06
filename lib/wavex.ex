@@ -1,6 +1,6 @@
 defmodule Wavex do
   @moduledoc """
-  Reading PCM WAVE files.
+  Reading a PCM WAVE file.
   """
 
   alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader}
@@ -18,8 +18,6 @@ defmodule Wavex do
 
   ## Examples
       
-  [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/)
-
       iex Wavex.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
       ...>   0x24, 0x08, 0x00, 0x00, #  38

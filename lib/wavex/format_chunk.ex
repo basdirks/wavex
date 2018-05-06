@@ -169,8 +169,6 @@ defmodule Wavex.FormatChunk do
 
   ## Examples
 
-  [sapp.org, 2018-04-30, Microsoft WAVE soundfile format](http://soundfile.sapp.org/doc/WaveFormat/)
-
       iex Wavex.FormatChunk.read(<<
       ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
       ...>   0x10, 0x00, 0x00, 0x00, #  16
