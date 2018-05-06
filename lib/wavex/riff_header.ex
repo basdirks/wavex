@@ -30,7 +30,7 @@ defmodule Wavex.RIFFHeader do
       iex> Wavex.RIFFHeader.read(<<"RIFX", 0, 0, 0, 0, "WAVE">>)
       {:error, %Wavex.Error.UnexpectedID{expected: "RIFF", actual: "RIFX"}}
 
-  Bytes 5-8 must read `"WAVE"` to indicate a waveform audio file. Reading a
+  Bytes 9-12 must read `"WAVE"` to indicate a waveform audio file. Reading a
   different id returns an error.
 
       iex> Wavex.RIFFHeader.read(<<"RIFF", 0, 0, 0, 0, "AVI ">>)
@@ -41,7 +41,15 @@ defmodule Wavex.RIFFHeader do
       iex> Wavex.RIFFHeader.read(<<"RIFF", 0, 0>>)
       {:error, %Wavex.Error.UnexpectedEOF{}}
 
+  Generally, the following holds for any `x`:
+
+  ```elixir
+  not is_binary(x) or String.length(x) >= 12 or
+    Wavex.RIFFHeader.read(x) == %Wavex.Error.UnexpectedEOF{}
+  ```
+
   """
+
   @spec read(binary) :: {:ok, t, binary} | {:error, UnexpectedEOF.t() | UnexpectedID.t()}
   def read(binary) do
     with {:ok, etc} <- Utils.read_id(binary, "RIFF"),
