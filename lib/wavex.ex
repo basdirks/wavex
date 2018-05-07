@@ -16,6 +16,9 @@ defmodule Wavex do
   @doc ~S"""
   Read PCM WAVE data.
 
+  For more details, see `Wavex.RIFFHeader.read/1`, `Wavex.FormatChunk.read/1`,
+  and `Wavex.DataChunk.read/2`.
+
   ## Examples
       
       iex Wavex.read(<<

@@ -4,6 +4,8 @@
 
 Read PCM WAVE data.
 
+This package is still in early beta.
+
 ## Installation
 
 1.  Add `wavex` to your `mix.exs` dependencies:
