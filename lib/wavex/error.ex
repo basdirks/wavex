@@ -6,6 +6,7 @@ defmodule Wavex.Error do
   alias __MODULE__.{
     BlockAlignMismatch,
     ByteRateMismatch,
+    DataSizeMismatch,
     UnexpectedEOF,
     UnexpectedFormatSize,
     UnexpectedFourCC,
@@ -17,6 +18,7 @@ defmodule Wavex.Error do
   @type t ::
           BlockAlignMismatch.t()
           | ByteRateMismatch.t()
+          | DataSizeMismatch.t()
           | UnexpectedEOF.t()
           | UnexpectedFormatSize.t()
           | UnexpectedFourCC.t()
@@ -437,8 +439,8 @@ defmodule Wavex.Error do
     @moduledoc ~S"""
     An unexpected four character code.
 
-        iex> to_string(%Wavex.Error.UnexpectedFourCC{expected: "WAVE", actual: "AVI "})
-        "expected FourCC \"WAVE\", got: \"AVI \""
+        iex> to_string(%Wavex.Error.UnexpectedFourCC{expected: "WAVE", actual: "DIVX"})
+        "expected FourCC \"WAVE\", got: \"DIVX\""
 
     """
 
@@ -449,6 +451,26 @@ defmodule Wavex.Error do
     defimpl String.Chars, for: __MODULE__ do
       def to_string(%UnexpectedFourCC{expected: expected, actual: actual}) do
         "expected FourCC \"#{expected}\", got: \"#{actual}\""
+      end
+    end
+  end
+
+  defmodule DataSizeMismatch do
+    @moduledoc ~S"""
+    An unexpected data size.
+
+        iex> to_string(%Wavex.Error.DataSizeMismatch{expected: 52, actual: 50})
+        "expected data size 52, got: 50"
+
+    """
+
+    defstruct [:expected, :actual]
+
+    @type t :: %__MODULE__{expected: binary, actual: binary}
+
+    defimpl String.Chars, for: __MODULE__ do
+      def to_string(%DataSizeMismatch{expected: expected, actual: actual}) do
+        "expected data size #{expected}, got: #{actual}"
       end
     end
   end

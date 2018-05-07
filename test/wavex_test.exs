@@ -5,6 +5,7 @@ defmodule WavexTest do
   doctest Wavex.Error
   doctest Wavex.Error.BlockAlignMismatch
   doctest Wavex.Error.ByteRateMismatch
+  doctest Wavex.Error.DataSizeMismatch
   doctest Wavex.Error.UnexpectedEOF
   doctest Wavex.Error.UnexpectedFormatSize
   doctest Wavex.Error.UnexpectedFourCC

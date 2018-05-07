@@ -4,6 +4,7 @@ defmodule Wavex do
   """
 
   alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader}
+  alias Wavex.Error.{DataSizeMismatch}
 
   defstruct [:riff_header, :format_chunk, :data_chunk]
 
@@ -12,6 +13,18 @@ defmodule Wavex do
           format_chunk: FormatChunk.t(),
           data_chunk: DataChunk.t()
         }
+
+  @riff_header_size 12
+  @format_chunk_size 24
+  @non_data_size @riff_header_size + @format_chunk_size + 8
+
+  @spec verify_data_size(non_neg_integer, non_neg_integer) ::
+          :ok | {:error, UnexpectedDataSize.t()}
+  defp verify_data_size(data_size, data_size), do: :ok
+
+  defp verify_data_size(expected_data_size, actual_data_size) do
+    {:error, %DataSizeMismatch{expected: expected_data_size, actual: actual_data_size}}
+  end
 
   @doc ~S"""
   Read PCM WAVE data.
@@ -23,7 +36,7 @@ defmodule Wavex do
       
       iex Wavex.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
-      ...>   0x24, 0x08, 0x00, 0x00, #  38
+      ...>   0x34, 0x00, 0x00, 0x00, #  52
       ...>   0x57, 0x41, 0x56, 0x45, #  W     A     V     E
       ...>   0x66, 0x6D, 0x74, 0x20, #  f     m     t     \s
       ...>   0x10, 0x00, 0x00, 0x00, #  16
@@ -40,7 +53,7 @@ defmodule Wavex do
       %Wavex{
         data_chunk: %Wavex.DataChunk{
           data: <<0, 0, 0, 0, 0, 0, 0, 0>>,
-          size: 2
+          size: 6
         },
         format_chunk: %Wavex.FormatChunk{
           bits_per_sample: 16,
@@ -49,12 +62,12 @@ defmodule Wavex do
           channels: 2,
           sample_rate: 22_050
         },
-        riff_header: %Wavex.RIFFHeader{size: 2084}
+        riff_header: %Wavex.RIFFHeader{size: 52}
       }}
 
       iex> Wavex.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
-      ...>   0x24, 0x08, 0x00, 0x00, #  38
+      ...>   0x30, 0x00, 0x00, 0x00, #  48
       ...>   0x57, 0x41, 0x56, 0x45, #  W     A     V     E
       ...>   0x66, 0x6D, 0x74, 0x20, #  f     m     t     \s
       ...>   0x10, 0x00, 0x00, 0x00, #  16
@@ -76,16 +89,17 @@ defmodule Wavex do
             channels: 1,
             sample_rate: 11025
           },
-          riff_header: %Wavex.RIFFHeader{size: 2084}
+          riff_header: %Wavex.RIFFHeader{size: 48}
         }}
 
   """
   @spec read(binary) :: {:ok, t} | {:error, Error.t()}
   def read(binary) when is_binary(binary) do
-    with {:ok, %RIFFHeader{} = riff_header, etc} <- RIFFHeader.read(binary),
+    with {:ok, %RIFFHeader{size: size} = riff_header, etc} <- RIFFHeader.read(binary),
          {:ok, %FormatChunk{block_align: block_align} = format_chunk, etc} <-
            FormatChunk.read(etc),
-         {:ok, %DataChunk{} = data_chunk} <- DataChunk.read(etc, block_align) do
+         {:ok, %DataChunk{size: data_size} = data_chunk} <- DataChunk.read(etc, block_align),
+         :ok <- verify_data_size(size - @non_data_size, block_align * data_size) do
       {:ok, %Wavex{riff_header: riff_header, format_chunk: format_chunk, data_chunk: data_chunk}}
     else
       {:error, _} = error -> error

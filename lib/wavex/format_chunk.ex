@@ -38,10 +38,15 @@ defmodule Wavex.FormatChunk do
           bits_per_sample: pos_integer
         }
 
+  @expected_format_size 16
+  @expected_format 1
+  @expected_fmt_four_cc "fmt "
+  @supported_bits_per_sample_values [8, 16, 24]
+
   @spec read_size(binary) :: {:ok, binary} | {:error, UnexpectedFormatSize.t()}
   defp read_size(<<size::32-little, etc::binary>>) do
     case size do
-      16 -> {:ok, etc}
+      @expected_format_size -> {:ok, etc}
       _ -> {:error, %UnexpectedFormatSize{size: size}}
     end
   end
@@ -49,13 +54,16 @@ defmodule Wavex.FormatChunk do
   @spec read_format(binary) :: {:ok, binary} | {:error, UnsupportedFormat.t()}
   defp read_format(<<format::16-little, etc::binary>>) do
     case format do
-      1 -> {:ok, etc}
+      @expected_format -> {:ok, etc}
       _ -> {:error, %UnsupportedFormat{format: format}}
     end
   end
 
   @spec verify_bits_per_sample(non_neg_integer) :: :ok | {:error, UnsupportedBitsPerSample.t()}
-  defp verify_bits_per_sample(bits_per_sample) when bits_per_sample in [8, 16, 24], do: :ok
+  defp verify_bits_per_sample(bits_per_sample)
+       when bits_per_sample in @supported_bits_per_sample_values do
+    :ok
+  end
 
   defp verify_bits_per_sample(bits_per_sample) do
     {:error, %UnsupportedBitsPerSample{bits_per_sample: bits_per_sample}}
@@ -215,7 +223,7 @@ defmodule Wavex.FormatChunk do
   ### Format size
 
   The format size at bytes 5-8 is expected to be `16`, the default format size
-  for the PCM format. The following example gives an error because the format
+  for the LPCM format. The following example gives an error because the format
   size is `18` instead of `16`.
 
       iex> Wavex.FormatChunk.read(<<
@@ -230,7 +238,7 @@ defmodule Wavex.FormatChunk do
 
   ### Format size
 
-  The format at bytes 9-12 must be `0x0001` (PCM), as other formats are not
+  The format at bytes 9-12 must be `0x0001` (LPCM), as other formats are not
   supported. The following example gives an error because the format is
   `0x0032` instead of `0x0001`.
 
@@ -262,7 +270,7 @@ defmodule Wavex.FormatChunk do
              | UnsupportedFormat.t()
              | ZeroChannels.t()}
   def read(binary) when is_binary(binary) do
-    with {:ok, etc} <- Utils.read_fourCC(binary, "fmt "),
+    with {:ok, etc} <- Utils.read_fourCC(binary, @expected_fmt_four_cc),
          {:ok, etc} <- read_size(etc),
          {:ok, etc} <- read_format(etc),
          <<

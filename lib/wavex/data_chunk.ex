@@ -17,6 +17,8 @@ defmodule Wavex.DataChunk do
 
   @type t :: %__MODULE__{size: non_neg_integer, data: binary}
 
+  @expected_data_four_cc "data"
+
   @doc ~S"""
   Read a data chunk.
 
@@ -45,7 +47,7 @@ defmodule Wavex.DataChunk do
           {:ok, t} | {:error, UnexpectedEOF.t() | UnexpectedFourCC.t()}
   def read(binary, block_align)
       when is_binary(binary) and is_integer(block_align) and block_align > 0 do
-    with {:ok, etc} <- Utils.read_fourCC(binary, "data"),
+    with {:ok, etc} <- Utils.read_fourCC(binary, @expected_data_four_cc),
          <<size::32-little, etc::binary>> <- etc,
          bytes <- size * block_align,
          <<data::binary-size(bytes), _::binary>> <- etc do
