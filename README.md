@@ -10,7 +10,7 @@ writing of any valid LPCM WAVE file, as specified in _EBU - TECH 3285:
 Specification of the Broadcast Wave Format (BWF), Version 2.0_, a copy of which
 can be found at `priv/tech3285.pdf` of the source repository.
 
-Sources:
+## Sources
 
 * [EBU – TECH 3285: Specification of the Broadcast Wave Format (BWF), Version 2.0](https://tech.ebu.ch/docs/tech/tech3285.pdf)
 * [McGill Engineering: Wave File Specifications](http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html)
@@ -23,7 +23,7 @@ Sources:
 ```elixir
 def deps do
   [
-    {:wavex, "~> 0.4.13"}
+    {:wavex, "~> 0.4.14"}
   ]
 end
 ```
@@ -33,7 +33,3 @@ end
 ```elixir
 $ mix deps.get
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/wavex](https://hexdocs.pm/wavex).
