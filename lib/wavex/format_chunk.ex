@@ -255,7 +255,7 @@ defmodule Wavex.FormatChunk do
   ### Internal consistency
 
   The resulting `%Wavex.FormatChunk{}` is checked for internal consistency
-  with `Wavex.FormatChunk.validate/1`.
+  by `Wavex.FormatChunk.validate/1`.
 
   """
   @spec read(binary) ::

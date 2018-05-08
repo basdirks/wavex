@@ -20,6 +20,8 @@ defmodule Wavex do
   and `Wavex.DataChunk.read/2`.
 
   ## Examples
+
+  Reading a 16-bit stereo 88200b/s LPCM file:
       
       iex> Wavex.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
@@ -51,6 +53,8 @@ defmodule Wavex do
          },
          riff_header: %Wavex.RIFFHeader{size: 52}
        }}
+
+  Reading a 16-bit mono 22050/s LPCM file:
 
       iex> Wavex.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
