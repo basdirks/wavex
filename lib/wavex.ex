@@ -1,6 +1,6 @@
 defmodule Wavex do
   @moduledoc """
-  Read PCM WAVE data.
+  Read LPCM WAVE data.
   """
 
   alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader}
@@ -14,7 +14,7 @@ defmodule Wavex do
         }
 
   @doc ~S"""
-  Read PCM WAVE data.
+  Read LPCM WAVE data.
 
   For more details, see `Wavex.RIFFHeader.read/1`, `Wavex.FormatChunk.read/1`,
   and `Wavex.DataChunk.read/2`.

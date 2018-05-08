@@ -2,7 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/v/wavex.svg?style=flat-square)](https://hex.pm/packages/wavex)
 
-Read PCM WAVE data.
+Read LPCM WAVE data.
 
 This package is still in early beta.
 

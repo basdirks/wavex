@@ -26,13 +26,13 @@ defmodule Wavex.Error do
 
   defmodule UnsupportedFormat do
     @moduledoc """
-    An unsupported format. Currently, only 0x0001 (PCM) is supported.
+    An unsupported format. Currently, only 0x0001 (LPCM) is supported.
 
         iex> to_string(%Wavex.Error.UnsupportedFormat{format: 0x0000})
-        "expected format 1 (PCM), got: 0 (UNKNOWN)"
+        "expected format 1 (LPCM), got: 0 (UNKNOWN)"
 
         iex> to_string(%Wavex.Error.UnsupportedFormat{format: 0x0050})
-        "expected format 1 (PCM), got: 80 (MPEG)"
+        "expected format 1 (LPCM), got: 80 (MPEG)"
 
     """
 
@@ -311,7 +311,7 @@ defmodule Wavex.Error do
       }
 
       def to_string(%UnsupportedFormat{format: format}) do
-        "expected format 1 (PCM), got: #{format} (#{Map.get(@formats, format)})"
+        "expected format 1 (LPCM), got: #{format} (#{Map.get(@formats, format)})"
       end
     end
   end

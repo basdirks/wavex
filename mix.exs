@@ -4,9 +4,9 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.4.0",
+      version: "0.4.1",
       elixir: "~> 1.6",
-      description: "Read WAVE PCM data",
+      description: "Read WAVE LPCM data",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
