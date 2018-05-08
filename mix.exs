@@ -4,8 +4,9 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.4.6",
+      version: "0.4.7",
       elixir: "~> 1.6",
+      docs: docs(),
       description: "Read WAVE LPCM data",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -19,6 +20,12 @@ defmodule Wavex.MixProject do
     []
   end
 
+  defp docs do
+    [
+      extras: [{"README.md", title: "Readme"}]
+    ]
+  end
+
   defp deps do
     [
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
@@ -30,6 +37,7 @@ defmodule Wavex.MixProject do
 
   defp package do
     [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
       licenses: ["Apache 2"],
       links: %{"GitHub" => "https://github.com/basdirks/wavex"},
       maintainers: ["Bas Dirks"],
