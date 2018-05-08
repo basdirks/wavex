@@ -6,6 +6,12 @@ Read PCM WAVE data.
 
 This package is still in early beta.
 
+Sources:
+
+https://tech.ebu.ch/docs/tech/tech3285.pdf
+http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+https://www.loc.gov/preservation/digital/formats/fdd/fdd000001.shtml
+
 ## Installation
 
 1.  Add `wavex` to your `mix.exs` dependencies:

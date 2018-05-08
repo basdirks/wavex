@@ -4,7 +4,6 @@ defmodule Wavex do
   """
 
   alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader}
-  alias Wavex.Error.{DataSizeMismatch}
 
   defstruct [:riff_header, :format_chunk, :data_chunk]
 
@@ -13,18 +12,6 @@ defmodule Wavex do
           format_chunk: FormatChunk.t(),
           data_chunk: DataChunk.t()
         }
-
-  @riff_header_size 12
-  @format_chunk_size 24
-  @non_data_size @riff_header_size + @format_chunk_size + 8
-
-  @spec verify_data_size(non_neg_integer, non_neg_integer) ::
-          :ok | {:error, UnexpectedDataSize.t()}
-  defp verify_data_size(data_size, data_size), do: :ok
-
-  defp verify_data_size(expected_data_size, actual_data_size) do
-    {:error, %DataSizeMismatch{expected: expected_data_size, actual: actual_data_size}}
-  end
 
   @doc ~S"""
   Read PCM WAVE data.
@@ -76,18 +63,18 @@ defmodule Wavex do
       ...>   0x22, 0x56, 0x00, 0x00, #  22050
       ...>   0x02, 0x00, 0x10, 0x00, #  2           16
       ...>   0x64, 0x61, 0x74, 0x61, #  d     a     t     a
-      ...>   0x02, 0x00, 0x00, 0x00, #  2
+      ...>   0x04, 0x00, 0x00, 0x00, #  4
       ...>   0x00, 0x00, 0xFE, 0xFF  #  0     0     254   255
       ...> >>)
       {:ok,
         %Wavex{
-          data_chunk: %Wavex.DataChunk{data: <<0, 0, 254, 255>>, size: 2},
+          data_chunk: %Wavex.DataChunk{data: <<0, 0, 254, 255>>, size: 4},
           format_chunk: %Wavex.FormatChunk{
             bits_per_sample: 16,
             block_align: 2,
-            byte_rate: 22050,
+            byte_rate: 22_050,
             channels: 1,
-            sample_rate: 11025
+            sample_rate: 11_025
           },
           riff_header: %Wavex.RIFFHeader{size: 48}
         }}
@@ -95,11 +82,9 @@ defmodule Wavex do
   """
   @spec read(binary) :: {:ok, t} | {:error, Error.t()}
   def read(binary) when is_binary(binary) do
-    with {:ok, %RIFFHeader{size: size} = riff_header, etc} <- RIFFHeader.read(binary),
-         {:ok, %FormatChunk{block_align: block_align} = format_chunk, etc} <-
-           FormatChunk.read(etc),
-         {:ok, %DataChunk{size: data_size} = data_chunk} <- DataChunk.read(etc, block_align),
-         :ok <- verify_data_size(size - @non_data_size, block_align * data_size) do
+    with {:ok, %RIFFHeader{} = riff_header, etc} <- RIFFHeader.read(binary),
+         {:ok, %FormatChunk{} = format_chunk, etc} <- FormatChunk.read(etc),
+         {:ok, %DataChunk{} = data_chunk} <- DataChunk.read(etc) do
       {:ok, %Wavex{riff_header: riff_header, format_chunk: format_chunk, data_chunk: data_chunk}}
     else
       {:error, _} = error -> error
