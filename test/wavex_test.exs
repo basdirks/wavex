@@ -6,7 +6,6 @@ defmodule WavexTest do
   alias Wavex.Error.{
     BlockAlignMismatch,
     ByteRateMismatch,
-    DataSizeMismatch,
     UnexpectedEOF,
     UnexpectedFormatSize,
     UnexpectedFourCC,
@@ -20,7 +19,6 @@ defmodule WavexTest do
   doctest Error
   doctest BlockAlignMismatch
   doctest ByteRateMismatch
-  doctest DataSizeMismatch
   doctest UnexpectedEOF
   doctest UnexpectedFormatSize
   doctest UnexpectedFourCC
