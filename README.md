@@ -2,7 +2,6 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/v/wavex.svg?style=flat-square)](https://hex.pm/packages/wavex)
 [![Build Status](https://travis-ci.org/basdirks/wavex.svg?branch=master)](https://travis-ci.org/basdirks/wavex)
-[![Inline docs](http://inch-ci.org/github/basdirks/wavex.svg)](http://inch-ci.org/github/basdirks/wavex)
 
 Read LPCM WAVE data.
 
@@ -24,7 +23,7 @@ Sources:
 ```elixir
 def deps do
   [
-    {:wavex, "~> 0.4.12"}
+    {:wavex, "~> 0.4.13"}
   ]
 end
 ```
