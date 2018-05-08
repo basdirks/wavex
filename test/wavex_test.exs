@@ -1,4 +1,6 @@
 defmodule WavexTest do
+  @moduledoc false
+
   use ExUnit.Case
 
   alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader, Utils}
@@ -29,9 +31,7 @@ defmodule WavexTest do
   doctest RIFFHeader
   doctest Utils
 
-  defp read(name) do
-    File.read!("priv/#{name}.wav")
-  end
+  defp read(name), do: File.read!("priv/#{name}.wav")
 
   describe "reading WAVE files" do
     test "stereo A-law data" do
@@ -79,6 +79,15 @@ defmodule WavexTest do
                 }},
                wave
              )
+    end
+
+    test "stereo µ-law data" do
+      wave =
+        "M1F1-mulaw-AFsp"
+        |> read()
+        |> Wavex.read()
+
+      assert wave == {:error, %UnexpectedFormatSize{size: 18}}
     end
   end
 end

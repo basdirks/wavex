@@ -4,7 +4,9 @@
 
 Read LPCM WAVE data.
 
-This package is still in early beta.
+This package is still in early beta. Eventually, Wavex will support reading and
+writing of any valid LPCM WAVE file, as specified in EBU - TECH 3285:
+Specification of the Broadcast Wave Format (BWF), Version 2.0.
 
 Sources:
 
