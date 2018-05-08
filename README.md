@@ -22,7 +22,7 @@ Sources:
 ```elixir
 def deps do
   [
-    {:wavex, "~> 0.4.9"}
+    {:wavex, "~> 0.4.10"}
   ]
 end
 ```
