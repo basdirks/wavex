@@ -1,6 +1,6 @@
 defmodule Wavex.Chunk.Format do
   @moduledoc """
-  Reading a format chunk.
+  Read a format chunk.
   """
 
   alias Wavex.Utils
@@ -30,7 +30,7 @@ defmodule Wavex.Chunk.Format do
   defp verify_size(16), do: :ok
   defp verify_size(actual), do: {:error, %UnexpectedFormatSize{actual: actual}}
 
-  @spec verify_format(non_neg_integer) :: :ok | {:error, UnexpectedFormat.t()}
+  @spec verify_format(non_neg_integer) :: :ok | {:error, UnsupportedFormat.t()}
   defp verify_format(1), do: :ok
   defp verify_format(actual), do: {:error, %UnsupportedFormat{actual: actual}}
 

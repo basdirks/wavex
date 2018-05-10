@@ -8,7 +8,7 @@ defmodule Wavex.Utils do
   @doc """
   Verify a FourCC (four character code).
   """
-  @spec verify_four_cc(non_neg_integer, non_neg_integer) :: :ok | {:error, UnexpectedFourCC.t()}
+  @spec verify_four_cc(<<_::32>>, <<_::32>>) :: :ok | {:error, UnexpectedFourCC.t()}
   def verify_four_cc(expected, expected), do: :ok
 
   def verify_four_cc(actual, expected) do

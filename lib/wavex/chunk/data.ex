@@ -1,6 +1,6 @@
 defmodule Wavex.Chunk.Data do
   @moduledoc """
-  Reading a data chunk.
+  Read a data chunk.
   """
 
   alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}

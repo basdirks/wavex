@@ -1,6 +1,6 @@
 defmodule Wavex.Chunk.RIFF do
   @moduledoc """
-  Reading a RIFF chunk.
+  Read a RIFF chunk.
   """
 
   alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
