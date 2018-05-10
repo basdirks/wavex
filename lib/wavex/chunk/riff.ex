@@ -1,13 +1,6 @@
 defmodule Wavex.Chunk.RIFF do
   @moduledoc """
-  Reading a RIFF header.
-
-  The RIFF header is the first chunk in a WAVE file, and normally consists of:
-
-  - the `"RIFF"` FourCC,
-  - the file size,
-  - the `"WAVE"` FourCC.
-
+  Reading a RIFF chunk.
   """
 
   alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
@@ -31,7 +24,7 @@ defmodule Wavex.Chunk.RIFF do
 
   ## Caveats
 
-  ### "RIFF" FourCC
+  ### Chunk ID
 
   Bytes 1-4 must read `"RIFF"` to indicate the Resource Interchange File Format.
   A different value results in an error.
@@ -39,7 +32,7 @@ defmodule Wavex.Chunk.RIFF do
       iex> Wavex.Chunk.RIFF.read(<<"RIFX", 0, 0, 0, 0, "WAVE">>)
       {:error, %Wavex.Error.UnexpectedFourCC{expected: "RIFF", actual: "RIFX"}}
 
-  ### "WAVE" FourCC
+  ### WAVE ID
 
   Bytes 9-12 must read `"WAVE"` to indicate a waveform audio file. A different
   value results in an error.

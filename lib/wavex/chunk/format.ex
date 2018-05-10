@@ -1,18 +1,6 @@
 defmodule Wavex.Chunk.Format do
   @moduledoc """
   Reading a format chunk.
-
-  A format chunk normally contains information about the data that follows:
-
-  - chunk id
-  - format size
-  - format
-  - number of channels
-  - sample rate
-  - byte rate
-  - block alignment
-  - bits per sample
-
   """
 
   alias Wavex.Utils
@@ -93,11 +81,10 @@ defmodule Wavex.Chunk.Format do
 
   ## Caveats
 
-  ### "fmt " FourCC
+  ### Chunk ID
 
-  Bytes 1-4 must read `"fmt "` to indicate a format chunk. A different value
-  results in an error. The following example gives an error because bytes 1-4
-  read `"data"` instead of `"fmt "`.
+  Bytes 1-4 must read `"fmt "` to indicate a format chunk. The following
+  example gives an error because bytes 1-4 read `"data"` instead of `"fmt "`.
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x64, 0x61, 0x74, 0x61, #  d     a     t     a
@@ -125,9 +112,9 @@ defmodule Wavex.Chunk.Format do
       ...> >>)
       {:error, %Wavex.Error.UnexpectedFormatSize{actual: 18}}
 
-  ### Format size
+  ### Format
 
-  The format at bytes 9-12 must be `0x0001` (LPCM), as other formats are not
+  The format at bytes 9-10 must be `0x0001` (LPCM), as other formats are not
   supported. The following example gives an error because the format is
   `0x0032` instead of `0x0001`.
 
@@ -140,6 +127,38 @@ defmodule Wavex.Chunk.Format do
       ...>   0x04, 0x00, 0x10, 0x00  #  4           16
       ...> >>)
       {:error, %Wavex.Error.UnsupportedFormat{actual: 0x0032}}
+
+  ### Channels
+
+  The format at bytes 11-12 must not be `0`, because there has to be at least
+  one channel. The following example gives an error because the number of
+  channels is `0`.
+
+      iex> Wavex.Chunk.Format.read(<<
+      ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
+      ...>   0x10, 0x00, 0x00, 0x00, #  16
+      ...>   0x01, 0x00, 0x00, 0x00, #  1           0
+      ...>   0x22, 0x56, 0x00, 0x00, #  22050
+      ...>   0x88, 0x58, 0x01, 0x00, #  88200
+      ...>   0x04, 0x00, 0x10, 0x00  #  4           16
+      ...> >>)
+      {:error, %Wavex.Error.ZeroChannels{}}
+
+  ### Bits per sample
+
+  The bits per second at bytes 23-24 must be `8`, `16`, or `24`, as other bit
+  rates are not supported. The following example gives an error because the
+  bit rate is `32`.
+
+      iex> Wavex.Chunk.Format.read(<<
+      ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
+      ...>   0x10, 0x00, 0x00, 0x00, #  16
+      ...>   0x01, 0x00, 0x02, 0x00, #  1           2
+      ...>   0x22, 0x56, 0x00, 0x00, #  22050
+      ...>   0x88, 0x58, 0x01, 0x00, #  88200
+      ...>   0x04, 0x00, 0x20, 0x00  #  4           32
+      ...> >>)
+      {:error, %Wavex.Error.UnsupportedBitsPerSample{actual: 32}}
 
   """
   @spec read(binary) ::

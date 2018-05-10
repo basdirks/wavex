@@ -1,13 +1,6 @@
 defmodule Wavex.Chunk.Data do
   @moduledoc """
   Reading a data chunk.
-
-  A data chunk normally contains:
-
-  - a `"data"` FourCC,
-  - the size of the actual audio data,
-  - the actual audio data.
-
   """
 
   alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
@@ -32,7 +25,7 @@ defmodule Wavex.Chunk.Data do
 
   ## Caveat
 
-  ### "data" FourCC
+  ### Chunk ID
 
   Bytes 1-4 must read `"data"` to indicate a data chunk. A different value
   results in an error.

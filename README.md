@@ -5,10 +5,12 @@
 
 Read LPCM WAVE data.
 
-This package is still in early beta. Eventually, Wavex will support reading and
-writing of any valid LPCM WAVE file, as specified in _EBU - TECH 3285:
-Specification of the Broadcast Wave Format (BWF), Version 2.0_, a copy of which
-can be found at `priv/tech3285.pdf` of the source repository.
+This package is still in early beta.
+
+Eventually, Wavex will support reading and writing of any valid LPCM WAVE
+file, as specified in _EBU - TECH 3285: Specification of the Broadcast Wave
+Format (BWF), Version 2.0_, a copy of which can be found at
+`priv/tech3285.pdf` in the source repository.
 
 ## Sources
 
@@ -23,7 +25,7 @@ can be found at `priv/tech3285.pdf` of the source repository.
 ```elixir
 def deps do
   [
-    {:wavex, "~> 0.5.2"}
+    {:wavex, "~> 0.5.3"}
   ]
 end
 ```
