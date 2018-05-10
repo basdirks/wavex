@@ -152,11 +152,6 @@ defmodule Wavex.Chunk.Format do
       ...> >>)
       {:error, %Wavex.Error.UnsupportedFormat{actual: 0x0032}}
 
-  ### Internal consistency
-
-  The resulting `%Wavex.Chunk.Format{}` is checked for internal consistency
-  by `Wavex.Chunk.Format.validate/1`.
-
   """
   @spec read(binary) ::
           {:ok, t, binary}
