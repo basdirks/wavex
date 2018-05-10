@@ -17,8 +17,6 @@ defmodule Wavex.Chunk.Data do
 
   @type t :: %__MODULE__{size: non_neg_integer, data: binary}
 
-  @expected_data_four_cc "data"
-
   @doc ~S"""
   Read a data chunk.
 
@@ -55,7 +53,7 @@ defmodule Wavex.Chunk.Data do
         data::binary-size(size),
         _::binary
       >>) do
-    with :ok <- Utils.verify_four_cc(data_four_cc, @expected_data_four_cc) do
+    with :ok <- Utils.verify_four_cc(data_four_cc, "data") do
       {:ok, %__MODULE__{size: size, data: data}}
     end
   end

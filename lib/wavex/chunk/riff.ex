@@ -17,9 +17,6 @@ defmodule Wavex.Chunk.RIFF do
 
   @type t :: %__MODULE__{size: pos_integer}
 
-  @expected_riff_four_cc "RIFF"
-  @expected_wave_four_cc "WAVE"
-
   @doc ~S"""
   Read a RIFF header.
 
@@ -74,8 +71,8 @@ defmodule Wavex.Chunk.RIFF do
         wave_four_cc::binary-size(4),
         etc::binary
       >>) do
-    with :ok <- Utils.verify_four_cc(riff_four_cc, @expected_riff_four_cc),
-         :ok <- Utils.verify_four_cc(wave_four_cc, @expected_wave_four_cc) do
+    with :ok <- Utils.verify_four_cc(riff_four_cc, "RIFF"),
+         :ok <- Utils.verify_four_cc(wave_four_cc, "WAVE") do
       {:ok, %__MODULE__{size: size}, etc}
     end
   end

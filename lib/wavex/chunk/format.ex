@@ -4,14 +4,14 @@ defmodule Wavex.Chunk.Format do
 
   A format chunk normally contains information about the data that follows:
 
-  - a `"fmt "` FourCC,
-  - a format size,
-  - a format,
-  - the number of channels,
-  - a sample rate,
-  - a byte rate,
-  - block alignment,
-  - the bits per sample.
+  - chunk id
+  - format size
+  - format
+  - number of channels
+  - sample rate
+  - byte rate
+  - block alignment
+  - bits per sample
 
   """
 
@@ -38,28 +38,17 @@ defmodule Wavex.Chunk.Format do
           bits_per_sample: pos_integer
         }
 
-  @expected_format_size 16
-  @expected_format 1
-  @expected_fmt_four_cc "fmt "
-  @supported_bits_per_sample_values [8, 16, 24]
-
   @spec verify_size(non_neg_integer) :: :ok | {:error, UnexpectedFormatSize.t()}
-  defp verify_size(@expected_format_size), do: :ok
+  defp verify_size(16), do: :ok
   defp verify_size(actual), do: {:error, %UnexpectedFormatSize{actual: actual}}
 
-  @spec verify_format(non_neg_integer) :: :ok | {:error, UnexpectedFormatSize.t()}
-  defp verify_format(@expected_format), do: :ok
+  @spec verify_format(non_neg_integer) :: :ok | {:error, UnexpectedFormat.t()}
+  defp verify_format(1), do: :ok
   defp verify_format(actual), do: {:error, %UnsupportedFormat{actual: actual}}
 
   @spec verify_bits_per_sample(non_neg_integer) :: :ok | {:error, UnsupportedBitsPerSample.t()}
-  defp verify_bits_per_sample(actual)
-       when actual in @supported_bits_per_sample_values do
-    :ok
-  end
-
-  defp verify_bits_per_sample(actual) do
-    {:error, %UnsupportedBitsPerSample{actual: actual}}
-  end
+  defp verify_bits_per_sample(actual) when actual in [8, 16, 24], do: :ok
+  defp verify_bits_per_sample(actual), do: {:error, %UnsupportedBitsPerSample{actual: actual}}
 
   @spec verify_channels(non_neg_integer) :: :ok | {:error, ZeroChannels.t()}
   defp verify_channels(0), do: {:error, %ZeroChannels{}}
@@ -175,7 +164,7 @@ defmodule Wavex.Chunk.Format do
         bits_per_sample::16-little,
         etc::binary
       >>) do
-    with :ok <- Utils.verify_four_cc(fmt_four_cc, @expected_fmt_four_cc),
+    with :ok <- Utils.verify_four_cc(fmt_four_cc, "fmt "),
          :ok <- verify_size(size),
          :ok <- verify_format(format),
          :ok <- verify_channels(channels),
