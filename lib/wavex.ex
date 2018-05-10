@@ -18,7 +18,7 @@ defmodule Wavex do
   Read LPCM WAVE data.
 
   For more details, see `Wavex.Chunk.RIFF.read/1`, `Wavex.Chunk.Format.read/1`,
-  and `Wavex.Chunk.Data.read/2`.
+  and `Wavex.Chunk.Data.read/1`.
 
   ## Examples
 
