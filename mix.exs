@@ -4,7 +4,7 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.4.14",
+      version: "0.5.0",
       elixir: "~> 1.6",
       docs: docs(),
       description: "Read WAVE LPCM data",

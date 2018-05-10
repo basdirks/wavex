@@ -3,21 +3,22 @@ defmodule Wavex do
   Read LPCM WAVE data.
   """
 
-  alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader}
+  alias Wavex.Chunk.{Data, Format, RIFF}
+  alias Wavex.Error
 
-  defstruct [:riff_header, :format_chunk, :data_chunk]
+  defstruct [:riff, :format, :data]
 
   @type t :: %__MODULE__{
-          riff_header: RIFFHeader.t(),
-          format_chunk: FormatChunk.t(),
-          data_chunk: DataChunk.t()
+          riff: RIFF.t(),
+          format: Format.t(),
+          data: Data.t()
         }
 
   @doc ~S"""
   Read LPCM WAVE data.
 
-  For more details, see `Wavex.RIFFHeader.read/1`, `Wavex.FormatChunk.read/1`,
-  and `Wavex.DataChunk.read/2`.
+  For more details, see `Wavex.Chunk.RIFF.read/1`, `Wavex.Chunk.Format.read/1`,
+  and `Wavex.Chunk.Data.read/2`.
 
   ## Examples
 
@@ -40,18 +41,18 @@ defmodule Wavex do
       ...> >>)
       {:ok,
        %Wavex{
-         data_chunk: %Wavex.DataChunk{
+         data: %Wavex.Chunk.Data{
            data: <<0, 0, 0, 0, 0, 0, 0, 0>>,
            size: 8
          },
-         format_chunk: %Wavex.FormatChunk{
+         format: %Wavex.Chunk.Format{
            bits_per_sample: 16,
            block_align: 4,
            byte_rate: 88_200,
            channels: 2,
            sample_rate: 22_050
          },
-         riff_header: %Wavex.RIFFHeader{size: 52}
+         riff: %Wavex.Chunk.RIFF{size: 52}
        }}
 
   Reading a 16-bit mono 22050/s LPCM file:
@@ -72,26 +73,24 @@ defmodule Wavex do
       ...> >>)
       {:ok,
        %Wavex{
-         data_chunk: %Wavex.DataChunk{data: <<0, 0, 254, 255>>, size: 4},
-         format_chunk: %Wavex.FormatChunk{
+         data: %Wavex.Chunk.Data{data: <<0, 0, 254, 255>>, size: 4},
+         format: %Wavex.Chunk.Format{
            bits_per_sample: 16,
            block_align: 2,
            byte_rate: 22_050,
            channels: 1,
            sample_rate: 11_025
          },
-         riff_header: %Wavex.RIFFHeader{size: 48}
+         riff: %Wavex.Chunk.RIFF{size: 48}
        }}
 
   """
   @spec read(binary) :: {:ok, t} | {:error, Error.t()}
   def read(binary) when is_binary(binary) do
-    with {:ok, %RIFFHeader{} = riff_header, etc} <- RIFFHeader.read(binary),
-         {:ok, %FormatChunk{} = format_chunk, etc} <- FormatChunk.read(etc),
-         {:ok, %DataChunk{} = data_chunk} <- DataChunk.read(etc) do
-      {:ok, %Wavex{riff_header: riff_header, format_chunk: format_chunk, data_chunk: data_chunk}}
-    else
-      {:error, _} = error -> error
+    with {:ok, %RIFF{} = riff, etc} <- RIFF.read(binary),
+         {:ok, %Format{} = format, etc} <- Format.read(etc),
+         {:ok, %Data{} = data} <- Data.read(etc) do
+      {:ok, %Wavex{riff: riff, format: format, data: data}}
     end
   end
 end

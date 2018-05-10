@@ -23,7 +23,7 @@ can be found at `priv/tech3285.pdf` of the source repository.
 ```elixir
 def deps do
   [
-    {:wavex, "~> 0.4.14"}
+    {:wavex, "~> 0.5.0"}
   ]
 end
 ```

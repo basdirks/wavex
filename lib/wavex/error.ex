@@ -28,17 +28,17 @@ defmodule Wavex.Error do
     @moduledoc """
     An unsupported format. Currently, only 0x0001 (LPCM) is supported.
 
-        iex> to_string(%Wavex.Error.UnsupportedFormat{format: 0x0000})
+        iex> to_string(%Wavex.Error.UnsupportedFormat{actual: 0x0000})
         "expected format 1 (LPCM), got: 0 (UNKNOWN)"
 
-        iex> to_string(%Wavex.Error.UnsupportedFormat{format: 0x0050})
+        iex> to_string(%Wavex.Error.UnsupportedFormat{actual: 0x0050})
         "expected format 1 (LPCM), got: 80 (MPEG)"
 
     """
 
-    defstruct [:format]
+    defstruct [:actual]
 
-    @type t :: %__MODULE__{format: non_neg_integer}
+    @type t :: %__MODULE__{actual: non_neg_integer}
 
     defimpl String.Chars, for: __MODULE__ do
       # `@formats` were taken from github.com/tpn, 2018-05-01, winddk-8.1 / Include / shared / mmreg.h.
@@ -310,8 +310,8 @@ defmodule Wavex.Error do
         0xF1AC => "FLAC"
       }
 
-      def to_string(%UnsupportedFormat{format: format}) do
-        "expected format 1 (LPCM), got: #{format} (#{Map.get(@formats, format)})"
+      def to_string(%UnsupportedFormat{actual: actual}) do
+        "expected format 1 (LPCM), got: #{actual} (#{Map.get(@formats, actual)})"
       end
     end
   end
@@ -320,18 +320,18 @@ defmodule Wavex.Error do
     @moduledoc """
     An unexpected format size. A format size of 16 is expected.
 
-        iex> to_string(%Wavex.Error.UnexpectedFormatSize{size: 18})
+        iex> to_string(%Wavex.Error.UnexpectedFormatSize{actual: 18})
         "expected format size 16, got: 18"
 
     """
 
-    defstruct [:size]
+    defstruct [:actual]
 
-    @type t :: %__MODULE__{size: non_neg_integer}
+    @type t :: %__MODULE__{actual: non_neg_integer}
 
     defimpl String.Chars, for: __MODULE__ do
-      def to_string(%UnexpectedFormatSize{size: size}) do
-        "expected format size 16, got: #{size}"
+      def to_string(%UnexpectedFormatSize{actual: actual}) do
+        "expected format size 16, got: #{actual}"
       end
     end
   end
@@ -341,18 +341,18 @@ defmodule Wavex.Error do
     An unsupported bits per sample value. Currently, only values of 8, 16,
     and 24 are supported.
 
-        iex> to_string(%Wavex.Error.UnsupportedBitsPerSample{bits_per_sample: 32})
+        iex> to_string(%Wavex.Error.UnsupportedBitsPerSample{actual: 32})
         "expected bits per sample to be 8, 16, or 24, got: 32"
 
     """
 
-    defstruct [:bits_per_sample]
+    defstruct [:actual]
 
-    @type t :: %__MODULE__{bits_per_sample: non_neg_integer}
+    @type t :: %__MODULE__{actual: non_neg_integer}
 
     defimpl String.Chars, for: __MODULE__ do
-      def to_string(%UnsupportedBitsPerSample{bits_per_sample: bits_per_sample}) do
-        "expected bits per sample to be 8, 16, or 24, got: #{bits_per_sample}"
+      def to_string(%UnsupportedBitsPerSample{actual: actual}) do
+        "expected bits per sample to be 8, 16, or 24, got: #{actual}"
       end
     end
   end

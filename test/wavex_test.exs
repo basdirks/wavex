@@ -3,7 +3,8 @@ defmodule WavexTest do
 
   use ExUnit.Case
 
-  alias Wavex.{DataChunk, Error, FormatChunk, RIFFHeader, Utils}
+  alias Wavex.{Error, Utils}
+  alias Wavex.Chunk.{Data, Format, RIFF}
 
   alias Wavex.Error.{
     BlockAlignMismatch,
@@ -17,7 +18,7 @@ defmodule WavexTest do
   }
 
   doctest Wavex
-  doctest DataChunk
+  doctest Data
   doctest Error
   doctest BlockAlignMismatch
   doctest ByteRateMismatch
@@ -27,8 +28,8 @@ defmodule WavexTest do
   doctest UnsupportedBitsPerSample
   doctest UnsupportedFormat
   doctest ZeroChannels
-  doctest FormatChunk
-  doctest RIFFHeader
+  doctest Format
+  doctest RIFF
   doctest Utils
 
   defp read(name), do: File.read!("priv/#{name}.wav")
@@ -40,14 +41,14 @@ defmodule WavexTest do
         |> read()
         |> Wavex.read()
 
-      assert wave == {:error, %UnexpectedFormatSize{size: 18}}
+      assert wave == {:error, %UnexpectedFormatSize{actual: 18}}
     end
 
     test "stereo unsigned 8-bit data" do
       with etc <- read("M1F1-uint8-AFsp"),
-           {:ok, _, etc} <- RIFFHeader.read(etc),
-           {:ok, format_chunk, _} <- FormatChunk.read(etc) do
-        assert format_chunk == %FormatChunk{
+           {:ok, _, etc} <- RIFF.read(etc),
+           {:ok, format, _} <- Format.read(etc) do
+        assert format == %Format{
                  bits_per_sample: 8,
                  block_align: 2,
                  byte_rate: 16_000,
@@ -64,18 +65,18 @@ defmodule WavexTest do
       assert match?(
                {:ok,
                 %Wavex{
-                  data_chunk: %Wavex.DataChunk{
+                  data: %Data{
                     data: _,
                     size: 46_986
                   },
-                  format_chunk: %Wavex.FormatChunk{
+                  format: %Format{
                     bits_per_sample: 8,
                     block_align: 2,
                     byte_rate: 16_000,
                     channels: 2,
                     sample_rate: 8000
                   },
-                  riff_header: %Wavex.RIFFHeader{size: 47_188}
+                  riff: %RIFF{size: 47_188}
                 }},
                wave
              )
@@ -87,7 +88,7 @@ defmodule WavexTest do
         |> read()
         |> Wavex.read()
 
-      assert wave == {:error, %UnexpectedFormatSize{size: 18}}
+      assert wave == {:error, %UnexpectedFormatSize{actual: 18}}
     end
   end
 end

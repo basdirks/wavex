@@ -3,19 +3,15 @@ defmodule Wavex.Utils do
   Miscellaneous utilities.
   """
 
-  alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
+  alias Wavex.Error.UnexpectedFourCC
 
   @doc """
-  Read a FourCC (four character code).
+  Verify a FourCC (four character code).
   """
-  @spec read_fourCC(binary, binary) ::
-          {:ok, binary} | {:error, UnexpectedFourCC.t() | UnexpectedEOF.t()}
-  def read_fourCC(<<code::binary-size(4), etc::binary>>, expected_code) do
-    case code do
-      ^expected_code -> {:ok, etc}
-      _ -> {:error, %UnexpectedFourCC{expected: expected_code, actual: code}}
-    end
-  end
+  @spec verify_four_cc(non_neg_integer, non_neg_integer) :: :ok | {:error, UnexpectedFourCC.t()}
+  def verify_four_cc(expected, expected), do: :ok
 
-  def read_fourCC(_, _), do: {:error, %UnexpectedEOF{}}
+  def verify_four_cc(actual, expected) do
+    {:error, %UnexpectedFourCC{expected: expected, actual: actual}}
+  end
 end
