@@ -45,24 +45,23 @@ defmodule WavexTest do
     end
 
     test "M1F1-uint8-AFsp" do
-      wave = read("M1F1-uint8-AFsp")
+      {:ok, wave} = read("M1F1-uint8-AFsp")
 
       assert match?(
-               {:ok,
-                %Wavex{
-                  data: %Data{
-                    data: _,
-                    size: 46_986
-                  },
-                  format: %Format{
-                    bits_per_sample: 8,
-                    block_align: 2,
-                    byte_rate: 16_000,
-                    channels: 2,
-                    sample_rate: 8000
-                  },
-                  riff: %RIFF{size: 47_188}
-                }},
+               %Wavex{
+                 data: %Data{
+                   data: _,
+                   size: 46_986
+                 },
+                 format: %Format{
+                   bits_per_sample: 8,
+                   block_align: 2,
+                   byte_rate: 16_000,
+                   channels: 2,
+                   sample_rate: 8000
+                 },
+                 riff: %RIFF{size: 47_188}
+               },
                wave
              )
     end
@@ -73,24 +72,23 @@ defmodule WavexTest do
     end
 
     test "178186__snapper4298__camera-click-nikon" do
-      wave = read("178186__snapper4298__camera-click-nikon")
+      {:ok, wave} = read("178186__snapper4298__camera-click-nikon")
 
       assert match?(
-               {:ok,
-                %Wavex{
-                  data: %Data{
-                    data: _,
-                    size: 90_340
-                  },
-                  format: %Format{
-                    bits_per_sample: 16,
-                    block_align: 4,
-                    byte_rate: 176_400,
-                    channels: 2,
-                    sample_rate: 44_100
-                  },
-                  riff: %RIFF{size: 90_480}
-                }},
+               %Wavex{
+                 data: %Data{
+                   data: _,
+                   size: 90_340
+                 },
+                 format: %Format{
+                   bits_per_sample: 16,
+                   block_align: 4,
+                   byte_rate: 176_400,
+                   channels: 2,
+                   sample_rate: 44_100
+                 },
+                 riff: %RIFF{size: 90_480}
+               },
                wave
              )
     end
@@ -101,47 +99,45 @@ defmodule WavexTest do
     end
 
     test "213148__radiy__click" do
-      wave = read("213148__radiy__click")
+      {:ok, wave} = read("213148__radiy__click")
 
       assert match?(
-               {:ok,
-                %Wavex{
-                  data: %Wavex.Chunk.Data{
-                    data: _,
-                    size: 18_510
-                  },
-                  format: %Wavex.Chunk.Format{
-                    bits_per_sample: 16,
-                    block_align: 2,
-                    byte_rate: 88_200,
-                    channels: 1,
-                    sample_rate: 44_100
-                  },
-                  riff: %Wavex.Chunk.RIFF{size: 18_546}
-                }},
+               %Wavex{
+                 data: %Wavex.Chunk.Data{
+                   data: _,
+                   size: 18_510
+                 },
+                 format: %Wavex.Chunk.Format{
+                   bits_per_sample: 16,
+                   block_align: 2,
+                   byte_rate: 88_200,
+                   channels: 1,
+                   sample_rate: 44_100
+                 },
+                 riff: %Wavex.Chunk.RIFF{size: 18_546}
+               },
                wave
              )
     end
 
     test "262301__boulderbuff64__tongue-click" do
-      wave = read("262301__boulderbuff64__tongue-click")
+      {:ok, wave} = read("262301__boulderbuff64__tongue-click")
 
       assert match?(
-               {:ok,
-                %Wavex{
-                  data: %Wavex.Chunk.Data{
-                    data: _,
-                    size: 25_600
-                  },
-                  format: %Wavex.Chunk.Format{
-                    bits_per_sample: 16,
-                    block_align: 4,
-                    byte_rate: 176_400,
-                    channels: 2,
-                    sample_rate: 44_100
-                  },
-                  riff: %Wavex.Chunk.RIFF{size: 25_916}
-                }},
+               %Wavex{
+                 data: %Wavex.Chunk.Data{
+                   data: _,
+                   size: 25_600
+                 },
+                 format: %Wavex.Chunk.Format{
+                   bits_per_sample: 16,
+                   block_align: 4,
+                   byte_rate: 176_400,
+                   channels: 2,
+                   sample_rate: 44_100
+                 },
+                 riff: %Wavex.Chunk.RIFF{size: 25_916}
+               },
                wave
              )
     end
