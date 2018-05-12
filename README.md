@@ -7,6 +7,8 @@ Read LPCM WAVE data.
 
 This package is still in early beta.
 
+## Roadmap
+
 Eventually, Wavex will support reading and writing of any valid LPCM WAVE
 file, as specified in _EBU - TECH 3285: Specification of the Broadcast Wave
 Format (BWF), Version 2.0_, a copy of which can be found at
@@ -25,7 +27,7 @@ Format (BWF), Version 2.0_, a copy of which can be found at
 ```elixir
 def deps do
   [
-    {:wavex, "~> 0.6.0"}
+    {:wavex, "~> 0.7.1"}
   ]
 end
 ```

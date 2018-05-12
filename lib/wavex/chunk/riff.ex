@@ -59,7 +59,9 @@ defmodule Wavex.Chunk.RIFF do
 
   """
 
-  @spec read(binary) :: {:ok, t, binary} | {:error, UnexpectedEOF.t() | UnexpectedFourCC.t()}
+  @spec read(binary) ::
+          {:ok, t, binary}
+          | {:error, UnexpectedEOF.t() | UnexpectedFourCC.t()}
   def read(<<
         riff_id::binary-size(4),
         size::32-little,

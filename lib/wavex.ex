@@ -5,6 +5,7 @@ defmodule Wavex do
 
   alias Wavex.Chunk.{Data, Format, RIFF}
   alias Wavex.Error
+  alias Wavex.Error.RIFFSizeMismatch
 
   @enforce_keys [
     :riff,
@@ -24,6 +25,14 @@ defmodule Wavex do
           data: Data.t()
         }
 
+  @spec verify_riff_size(non_neg_integer, binary) :: :ok | {:error, RIFFSizeMismatch.t()}
+  defp verify_riff_size(actual, binary) do
+    case byte_size(binary) - 8 do
+      ^actual -> :ok
+      expected -> {:error, %RIFFSizeMismatch{expected: expected, actual: actual}}
+    end
+  end
+
   @doc ~S"""
   Read LPCM WAVE data.
 
@@ -36,7 +45,7 @@ defmodule Wavex do
       
       iex> Wavex.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
-      ...>   0x34, 0x00, 0x00, 0x00, #  52
+      ...>   0x2C, 0x00, 0x00, 0x00, #  44
       ...>   0x57, 0x41, 0x56, 0x45, #  W     A     V     E
       ...>   0x66, 0x6D, 0x74, 0x20, #  f     m     t     \s
       ...>   0x10, 0x00, 0x00, 0x00, #  16
@@ -62,14 +71,14 @@ defmodule Wavex do
            channels: 2,
            sample_rate: 22_050
          },
-         riff: %Wavex.Chunk.RIFF{size: 52}
+         riff: %Wavex.Chunk.RIFF{size: 44}
        }}
 
   Reading a 16-bit mono 22050/s LPCM file:
 
       iex> Wavex.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F
-      ...>   0x30, 0x00, 0x00, 0x00, #  48
+      ...>   0x28, 0x00, 0x00, 0x00, #  40
       ...>   0x57, 0x41, 0x56, 0x45, #  W     A     V     E
       ...>   0x66, 0x6D, 0x74, 0x20, #  f     m     t     \s
       ...>   0x10, 0x00, 0x00, 0x00, #  16
@@ -91,13 +100,14 @@ defmodule Wavex do
            channels: 1,
            sample_rate: 11_025
          },
-         riff: %Wavex.Chunk.RIFF{size: 48}
+         riff: %Wavex.Chunk.RIFF{size: 40}
        }}
 
   """
   @spec read(binary) :: {:ok, t} | {:error, Error.t()}
   def read(binary) when is_binary(binary) do
-    with {:ok, %RIFF{} = riff, etc} <- RIFF.read(binary),
+    with {:ok, %RIFF{size: riff_size} = riff, etc} <- RIFF.read(binary),
+         :ok <- verify_riff_size(riff_size, binary),
          {:ok, %Format{} = format, etc} <- Format.read(etc),
          {:ok, %Data{} = data} <- Data.read(etc) do
       {:ok, %Wavex{riff: riff, format: format, data: data}}

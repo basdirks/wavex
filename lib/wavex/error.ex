@@ -9,6 +9,8 @@ defmodule Wavex.Error do
     UnexpectedEOF,
     UnexpectedFormatSize,
     UnexpectedFourCC,
+    UnreadableDate,
+    UnreadableTime,
     UnsupportedBitsPerSample,
     UnsupportedFormat,
     ZeroChannels
@@ -20,6 +22,8 @@ defmodule Wavex.Error do
           | UnexpectedEOF.t()
           | UnexpectedFormatSize.t()
           | UnexpectedFourCC.t()
+          | UnreadableDate.t()
+          | UnreadableTime.t()
           | UnsupportedBitsPerSample.t()
           | UnsupportedFormat.t()
           | ZeroChannels.t()
@@ -35,6 +39,8 @@ defmodule Wavex.Error do
         "expected format 1 (LPCM), got: 80 (MPEG)"
 
     """
+
+    @enforce_keys [:actual]
 
     defstruct [:actual]
 
@@ -325,6 +331,8 @@ defmodule Wavex.Error do
 
     """
 
+    @enforce_keys [:actual]
+
     defstruct [:actual]
 
     @type t :: %__MODULE__{actual: non_neg_integer}
@@ -345,6 +353,8 @@ defmodule Wavex.Error do
         "expected bits per sample to be 8, 16, or 24, got: 32"
 
     """
+
+    @enforce_keys [:actual]
 
     defstruct [:actual]
 
@@ -402,7 +412,15 @@ defmodule Wavex.Error do
 
     """
 
-    defstruct [:expected, :actual]
+    @enforce_keys [
+      :expected,
+      :actual
+    ]
+
+    defstruct [
+      :expected,
+      :actual
+    ]
 
     @type t :: %__MODULE__{expected: non_neg_integer, actual: non_neg_integer}
 
@@ -422,7 +440,15 @@ defmodule Wavex.Error do
 
     """
 
-    defstruct [:expected, :actual]
+    @enforce_keys [
+      :expected,
+      :actual
+    ]
+
+    defstruct [
+      :expected,
+      :actual
+    ]
 
     @type t :: %__MODULE__{expected: non_neg_integer, actual: non_neg_integer}
 
@@ -442,7 +468,15 @@ defmodule Wavex.Error do
 
     """
 
-    defstruct [:expected, :actual]
+    @enforce_keys [
+      :expected,
+      :actual
+    ]
+
+    defstruct [
+      :expected,
+      :actual
+    ]
 
     @type t :: %__MODULE__{expected: binary, actual: binary}
 
@@ -462,6 +496,8 @@ defmodule Wavex.Error do
         "expected date to be of the form \"yyyy-mm-dd\", got: \"2000-01   \""
 
     """
+
+    @enforce_keys [:actual]
 
     defstruct [:actual]
 
@@ -484,6 +520,8 @@ defmodule Wavex.Error do
 
     """
 
+    @enforce_keys [:actual]
+
     defstruct [:actual]
 
     @type t :: %__MODULE__{actual: <<_::64>>}
@@ -491,6 +529,35 @@ defmodule Wavex.Error do
     defimpl String.Chars, for: __MODULE__ do
       def to_string(%UnreadableTime{actual: actual}) do
         "expected time to be of the form \"hh-mm-ss\", got: \"#{actual}\""
+      end
+    end
+  end
+
+  defmodule RIFFSizeMismatch do
+    @moduledoc """
+    A RIFF size that does not correspond to the file size. RIFF size must be
+    equal to file size - 8.
+
+        iex> to_string(%Wavex.Error.RIFFSizeMismatch{expected: 202, actual: 200})
+        "expected RIFF size 202, got: 200"
+
+    """
+
+    @enforce_keys [
+      :expected,
+      :actual
+    ]
+
+    defstruct [
+      :expected,
+      :actual
+    ]
+
+    @type t :: %__MODULE__{actual: non_neg_integer, expected: non_neg_integer}
+
+    defimpl String.Chars, for: __MODULE__ do
+      def to_string(%RIFFSizeMismatch{expected: expected, actual: actual}) do
+        "expected riff size #{expected}, got: #{actual}"
       end
     end
   end

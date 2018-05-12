@@ -45,7 +45,7 @@ defmodule WavexTest do
     end
 
     test "M1F1-uint8-AFsp" do
-      wavex = read("M1F1-uint8-AFsp")
+      wave = read("M1F1-uint8-AFsp")
 
       assert match?(
                {:ok,
@@ -63,7 +63,7 @@ defmodule WavexTest do
                   },
                   riff: %RIFF{size: 47_188}
                 }},
-               wavex
+               wave
              )
     end
 
@@ -73,7 +73,7 @@ defmodule WavexTest do
     end
 
     test "178186__snapper4298__camera-click-nikon" do
-      wavex = read("178186__snapper4298__camera-click-nikon")
+      wave = read("178186__snapper4298__camera-click-nikon")
 
       assert match?(
                {:ok,
@@ -91,7 +91,7 @@ defmodule WavexTest do
                   },
                   riff: %RIFF{size: 90_480}
                 }},
-               wavex
+               wave
              )
     end
 
@@ -101,48 +101,70 @@ defmodule WavexTest do
     end
 
     test "213148__radiy__click" do
-      wavex = read("213148__radiy__click")
+      wave = read("213148__radiy__click")
 
       assert match?(
                {:ok,
                 %Wavex{
                   data: %Wavex.Chunk.Data{
                     data: _,
-                    size: 18510
+                    size: 18_510
                   },
                   format: %Wavex.Chunk.Format{
                     bits_per_sample: 16,
                     block_align: 2,
-                    byte_rate: 88200,
+                    byte_rate: 88_200,
                     channels: 1,
-                    sample_rate: 44100
+                    sample_rate: 44_100
                   },
-                  riff: %Wavex.Chunk.RIFF{size: 18546}
+                  riff: %Wavex.Chunk.RIFF{size: 18_546}
                 }},
-               wavex
+               wave
              )
     end
 
     test "262301__boulderbuff64__tongue-click" do
-      wavex = read("262301__boulderbuff64__tongue-click")
+      wave = read("262301__boulderbuff64__tongue-click")
 
       assert match?(
                {:ok,
                 %Wavex{
                   data: %Wavex.Chunk.Data{
                     data: _,
-                    size: 25600
+                    size: 25_600
                   },
                   format: %Wavex.Chunk.Format{
                     bits_per_sample: 16,
                     block_align: 4,
                     byte_rate: 176_400,
                     channels: 2,
-                    sample_rate: 44100
+                    sample_rate: 44_100
                   },
-                  riff: %Wavex.Chunk.RIFF{size: 25916}
+                  riff: %Wavex.Chunk.RIFF{size: 25_916}
                 }},
-               wavex
+               wave
+             )
+    end
+
+    test "404551__inspectorj__clap-single-9" do
+      {:ok, wave} = read("404551__inspectorj__clap-single-9")
+
+      assert match?(
+               %Wavex{
+                 data: %Wavex.Chunk.Data{
+                   data: _,
+                   size: 164_160
+                 },
+                 format: %Wavex.Chunk.Format{
+                   bits_per_sample: 24,
+                   block_align: 6,
+                   byte_rate: 264_600,
+                   channels: 2,
+                   sample_rate: 44_100
+                 },
+                 riff: %Wavex.Chunk.RIFF{size: 164_304}
+               },
+               wave
              )
     end
   end
