@@ -6,7 +6,17 @@ defmodule Wavex do
   alias Wavex.Chunk.{Data, Format, RIFF}
   alias Wavex.Error
 
-  defstruct [:riff, :format, :data]
+  @enforce_keys [
+    :riff,
+    :format,
+    :data
+  ]
+
+  defstruct [
+    :riff,
+    :format,
+    :data
+  ]
 
   @type t :: %__MODULE__{
           riff: RIFF.t(),

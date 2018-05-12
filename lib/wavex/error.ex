@@ -452,4 +452,46 @@ defmodule Wavex.Error do
       end
     end
   end
+
+  defmodule UnreadableDate do
+    @moduledoc """
+    An unreadable date. Dates have to be of the form "yyyy-mm-dd", where the
+    minus/hyphen may be any character.
+
+        iex> to_string(%Wavex.Error.UnreadableDate{actual: "2000-01   "})
+        "expected date to be of the form \"yyyy-mm-dd\", got: \"2000-01   \""
+
+    """
+
+    defstruct [:actual]
+
+    @type t :: %__MODULE__{actual: <<_::80>>}
+
+    defimpl String.Chars, for: __MODULE__ do
+      def to_string(%UnreadableDate{actual: actual}) do
+        "expected date to be of the form \"yyyy-mm-dd\", got: \"#{actual}\""
+      end
+    end
+  end
+
+  defmodule UnreadableTime do
+    @moduledoc """
+    An unreadable time. Times have to be of the form "hh-mm-ss", where the
+    minus/hyphen may be any character.
+
+        iex> to_string(%Wavex.Error.UnreadableTime{actual: "12-00   "})
+        "expected time to be of the form \"hh-mm-ss\", got: \"12-00   \""
+
+    """
+
+    defstruct [:actual]
+
+    @type t :: %__MODULE__{actual: <<_::64>>}
+
+    defimpl String.Chars, for: __MODULE__ do
+      def to_string(%UnreadableTime{actual: actual}) do
+        "expected time to be of the form \"hh-mm-ss\", got: \"#{actual}\""
+      end
+    end
+  end
 end

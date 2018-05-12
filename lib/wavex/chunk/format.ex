@@ -16,7 +16,21 @@ defmodule Wavex.Chunk.Format do
     ZeroChannels
   }
 
-  defstruct [:channels, :sample_rate, :byte_rate, :block_align, :bits_per_sample]
+  @enforce_keys [
+    :channels,
+    :sample_rate,
+    :byte_rate,
+    :block_align,
+    :bits_per_sample
+  ]
+
+  defstruct [
+    :channels,
+    :sample_rate,
+    :byte_rate,
+    :block_align,
+    :bits_per_sample
+  ]
 
   @type t :: %__MODULE__{
           channels: pos_integer,
@@ -173,7 +187,7 @@ defmodule Wavex.Chunk.Format do
              | UnsupportedFormat.t()
              | ZeroChannels.t()}
   def read(<<
-        fmt_four_cc::binary-size(4),
+        fmt_id::binary-size(4),
         size::32-little,
         format::16-little,
         channels::16-little,
@@ -183,7 +197,7 @@ defmodule Wavex.Chunk.Format do
         bits_per_sample::16-little,
         etc::binary
       >>) do
-    with :ok <- Utils.verify_four_cc(fmt_four_cc, "fmt "),
+    with :ok <- Utils.verify_four_cc(fmt_id, "fmt "),
          :ok <- verify_size(size),
          :ok <- verify_format(format),
          :ok <- verify_channels(channels),

@@ -32,35 +32,20 @@ defmodule WavexTest do
   doctest RIFF
   doctest Utils
 
-  defp read(name), do: File.read!("priv/#{name}.wav")
+  defp read(name) do
+    "priv/#{name}.wav"
+    |> File.read!()
+    |> Wavex.read()
+  end
 
-  describe "reading WAVE files" do
-    test "stereo A-law data" do
-      wave =
-        "M1F1-Alaw-AFsp"
-        |> read()
-        |> Wavex.read()
-
-      assert wave == {:error, %UnexpectedFormatSize{actual: 18}}
+  describe "reading WAVE files found in the wild:" do
+    # A-law encoding is not supported.
+    test "M1F1-Alaw-AFsp" do
+      assert read("M1F1-Alaw-AFsp") == {:error, %UnexpectedFormatSize{actual: 18}}
     end
 
-    test "stereo unsigned 8-bit data" do
-      with etc <- read("M1F1-uint8-AFsp"),
-           {:ok, _, etc} <- RIFF.read(etc),
-           {:ok, format, _} <- Format.read(etc) do
-        assert format == %Format{
-                 bits_per_sample: 8,
-                 block_align: 2,
-                 byte_rate: 16_000,
-                 channels: 2,
-                 sample_rate: 8000
-               }
-      end
-
-      wave =
-        "M1F1-uint8-AFsp"
-        |> read()
-        |> Wavex.read()
+    test "M1F1-uint8-AFsp" do
+      wavex = read("M1F1-uint8-AFsp")
 
       assert match?(
                {:ok,
@@ -78,17 +63,87 @@ defmodule WavexTest do
                   },
                   riff: %RIFF{size: 47_188}
                 }},
-               wave
+               wavex
              )
     end
 
-    test "stereo µ-law data" do
-      wave =
-        "M1F1-mulaw-AFsp"
-        |> read()
-        |> Wavex.read()
+    # Mu-law encoding is not supported.
+    test "M1F1-mulaw-AFsp" do
+      assert read("M1F1-mulaw-AFsp") == {:error, %UnexpectedFormatSize{actual: 18}}
+    end
 
-      assert wave == {:error, %UnexpectedFormatSize{actual: 18}}
+    test "178186__snapper4298__camera-click-nikon" do
+      wavex = read("178186__snapper4298__camera-click-nikon")
+
+      assert match?(
+               {:ok,
+                %Wavex{
+                  data: %Data{
+                    data: _,
+                    size: 90_340
+                  },
+                  format: %Format{
+                    bits_per_sample: 16,
+                    block_align: 4,
+                    byte_rate: 176_400,
+                    channels: 2,
+                    sample_rate: 44_100
+                  },
+                  riff: %RIFF{size: 90_480}
+                }},
+               wavex
+             )
+    end
+
+    # The IEEE_FLOAT format is not supported.
+    test "415090__gusgus26__click-04" do
+      assert read("415090__gusgus26__click-04") == {:error, %UnsupportedFormat{actual: 3}}
+    end
+
+    test "213148__radiy__click" do
+      wavex = read("213148__radiy__click")
+
+      assert match?(
+               {:ok,
+                %Wavex{
+                  data: %Wavex.Chunk.Data{
+                    data: _,
+                    size: 18510
+                  },
+                  format: %Wavex.Chunk.Format{
+                    bits_per_sample: 16,
+                    block_align: 2,
+                    byte_rate: 88200,
+                    channels: 1,
+                    sample_rate: 44100
+                  },
+                  riff: %Wavex.Chunk.RIFF{size: 18546}
+                }},
+               wavex
+             )
+    end
+
+    test "262301__boulderbuff64__tongue-click" do
+      wavex = read("262301__boulderbuff64__tongue-click")
+
+      assert match?(
+               {:ok,
+                %Wavex{
+                  data: %Wavex.Chunk.Data{
+                    data: _,
+                    size: 25600
+                  },
+                  format: %Wavex.Chunk.Format{
+                    bits_per_sample: 16,
+                    block_align: 4,
+                    byte_rate: 176_400,
+                    channels: 2,
+                    sample_rate: 44100
+                  },
+                  riff: %Wavex.Chunk.RIFF{size: 25916}
+                }},
+               wavex
+             )
     end
   end
 end

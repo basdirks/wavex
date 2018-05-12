@@ -6,6 +6,8 @@ defmodule Wavex.Chunk.RIFF do
   alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
   alias Wavex.Utils
 
+  @enforce_keys [:size]
+
   defstruct [:size]
 
   @type t :: %__MODULE__{size: pos_integer}
@@ -59,13 +61,13 @@ defmodule Wavex.Chunk.RIFF do
 
   @spec read(binary) :: {:ok, t, binary} | {:error, UnexpectedEOF.t() | UnexpectedFourCC.t()}
   def read(<<
-        riff_four_cc::binary-size(4),
+        riff_id::binary-size(4),
         size::32-little,
-        wave_four_cc::binary-size(4),
+        wave_id::binary-size(4),
         etc::binary
       >>) do
-    with :ok <- Utils.verify_four_cc(riff_four_cc, "RIFF"),
-         :ok <- Utils.verify_four_cc(wave_four_cc, "WAVE") do
+    with :ok <- Utils.verify_four_cc(riff_id, "RIFF"),
+         :ok <- Utils.verify_four_cc(wave_id, "WAVE") do
       {:ok, %__MODULE__{size: size}, etc}
     end
   end
