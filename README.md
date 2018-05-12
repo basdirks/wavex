@@ -27,7 +27,7 @@ Format (BWF), Version 2.0_, a copy of which can be found at
 ```elixir
 def deps do
   [
-    {:wavex, "~> 0.7.1"}
+    {:wavex, "~> 0.7.2"}
   ]
 end
 ```
