@@ -38,6 +38,8 @@ defmodule Wavex do
 
   ## Examples
 
+  Calculating the duration of 100000 samples at 88200b/s.
+
       iex> Wavex.duration(%Wavex{
       ...>   data: %Wavex.Chunk.Data{
       ...>     data:
@@ -56,6 +58,8 @@ defmodule Wavex do
       ...>   riff: %Wavex.Chunk.RIFF{size: 100_036}
       ...> })
       1133.7868480725624
+
+  Calculating the duration of 100000 samples at 176400b/s.
 
       iex> Wavex.duration(%Wavex{
       ...>   data: %Wavex.Chunk.Data{
