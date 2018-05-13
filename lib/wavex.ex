@@ -34,7 +34,7 @@ defmodule Wavex do
   end
 
   @doc """
-  The duration of a wave file in milliseconds.
+  The duration of a wave file in seconds.
 
   ## Examples
 
@@ -57,7 +57,7 @@ defmodule Wavex do
       ...>   },
       ...>   riff: %Wavex.Chunk.RIFF{size: 100_036}
       ...> })
-      1133.7868480725624
+      1.1337868480725624
 
   Calculating the duration of 100000 samples at 176400b/s.
 
@@ -78,7 +78,7 @@ defmodule Wavex do
       ...>   },
       ...>   riff: %Wavex.Chunk.RIFF{size: 100_036}
       ...> })
-      566.8934240362812
+      0.5668934240362812
 
   """
   @spec duration(t) :: number
@@ -86,7 +86,7 @@ defmodule Wavex do
         data: %Data{size: size},
         format: %Format{byte_rate: byte_rate}
       }) do
-    size / byte_rate * 1000
+    size / byte_rate
   end
 
   @doc ~S"""
