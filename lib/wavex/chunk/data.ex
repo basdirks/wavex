@@ -31,9 +31,7 @@ defmodule Wavex.Chunk.Data do
       ...> >>)
       {:ok, %Wavex.Chunk.Data{size: 8, data: <<0, 0, 0, 0, 0, 0, 0, 0>>}}
 
-  ## Caveat
-
-  ### Chunk ID
+  ## Caveats
 
   Bytes 1-4 must read `"data"` to indicate a data chunk. A different value
   results in an error.

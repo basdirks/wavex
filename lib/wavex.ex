@@ -33,6 +33,213 @@ defmodule Wavex do
     end
   end
 
+  @doc """
+  The duration of a wave file in milliseconds.
+
+  ## Examples
+
+      iex> Wavex.duration(%Wavex{
+      ...>   data: %Wavex.Chunk.Data{
+      ...>     data:
+      ...>       0
+      ...>       |> List.duplicate(100_000)
+      ...>       |> List.to_string(),
+      ...>     size: 100_000
+      ...>   },
+      ...>   format: %Wavex.Chunk.Format{
+      ...>     bits_per_sample: 8,
+      ...>     block_align: 2,
+      ...>     byte_rate: 88_200,
+      ...>     channels: 2,
+      ...>     sample_rate: 44_100
+      ...>   },
+      ...>   riff: %Wavex.Chunk.RIFF{size: 100_036}
+      ...> })
+      1133.7868480725624
+
+      iex> Wavex.duration(%Wavex{
+      ...>   data: %Wavex.Chunk.Data{
+      ...>     data:
+      ...>       0
+      ...>       |> List.duplicate(100_000)
+      ...>       |> List.to_string(),
+      ...>     size: 100_000
+      ...>   },
+      ...>   format: %Wavex.Chunk.Format{
+      ...>     bits_per_sample: 16,
+      ...>     block_align: 4,
+      ...>     byte_rate: 176_400,
+      ...>     channels: 2,
+      ...>     sample_rate: 44_100
+      ...>   },
+      ...>   riff: %Wavex.Chunk.RIFF{size: 100_036}
+      ...> })
+      566.8934240362812
+
+  """
+  @spec duration(t) :: number
+  def duration(%__MODULE__{
+        data: %Data{size: size},
+        format: %Format{byte_rate: byte_rate}
+      }) do
+    size / byte_rate * 1000
+  end
+
+  @doc ~S"""
+  Map over the data of a `%Wavex{}` value.
+
+  ## Examples
+
+  Mapping over an 8-bit `%Wavex{}` value.
+
+      iex> wave = %Wavex{
+      ...>   riff: %RIFF{
+      ...>     size: 60
+      ...>   },
+      ...>   format: %Format{
+      ...>     bits_per_sample: 8,
+      ...>     block_align: 2,
+      ...>     byte_rate: 88_200,
+      ...>     channels: 2,
+      ...>     sample_rate: 44_100
+      ...>   },
+      ...>   data: %Data{
+      ...>     size: 24,
+      ...>     data: <<
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00
+      ...>     >>
+      ...>   }
+      ...> }
+      iex> wave = Wavex.map(wave, &(&1 + 0x12))
+      iex> wave.data.data
+      <<
+        0x12, 0x12, 0x12, 0x12,
+        0x12, 0x12, 0x12, 0x12,
+        0x12, 0x12, 0x12, 0x12,
+        0x12, 0x12, 0x12, 0x12,
+        0x12, 0x12, 0x12, 0x12,
+        0x12, 0x12, 0x12, 0x12
+      >>
+
+  Mapping over a 16-bit `%Wavex{}` value.
+
+      iex> wave = %Wavex{
+      ...>   riff: %RIFF{
+      ...>     size: 60
+      ...>   },
+      ...>   format: %Format{
+      ...>     bits_per_sample: 16,
+      ...>     block_align: 4,
+      ...>     byte_rate: 176_400,
+      ...>     channels: 2,
+      ...>     sample_rate: 44_100
+      ...>   },
+      ...>   data: %Data{
+      ...>     size: 24,
+      ...>     data: <<
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00
+      ...>     >>
+      ...>   }
+      ...> }
+      iex> wave = Wavex.map(wave, &(&1 - 0x1234))
+      iex> wave.data.data
+      <<
+        -0x1234::16-signed-little, -0x1234::16-signed-little,
+        -0x1234::16-signed-little, -0x1234::16-signed-little,
+        -0x1234::16-signed-little, -0x1234::16-signed-little,
+        -0x1234::16-signed-little, -0x1234::16-signed-little,
+        -0x1234::16-signed-little, -0x1234::16-signed-little,
+        -0x1234::16-signed-little, -0x1234::16-signed-little
+      >>
+
+  Mapping over a 24-bit `%Wavex{}` value.
+
+      iex> wave = %Wavex{
+      ...>   riff: %RIFF{
+      ...>     size: 60
+      ...>   },
+      ...>   format: %Format{
+      ...>     bits_per_sample: 24,
+      ...>     block_align: 4,
+      ...>     byte_rate: 176_400,
+      ...>     channels: 2,
+      ...>     sample_rate: 44_100
+      ...>   },
+      ...>   data: %Data{
+      ...>     size: 24,
+      ...>     data: <<
+      ...>       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      ...>       0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+      ...>     >>
+      ...>   }
+      ...> }
+      iex> wave = Wavex.map(wave, &(&1 + 0x123456))
+      iex> wave.data.data
+      <<
+        0x123456::24-signed-little, 0x123456::24-signed-little,
+        0x123456::24-signed-little, 0x123456::24-signed-little,
+        0x123456::24-signed-little, 0x123456::24-signed-little,
+        0x123456::24-signed-little, 0x123456::24-signed-little
+      >>
+
+  """
+  @spec map(t, (integer -> integer)) :: t
+  def map(
+        %__MODULE__{
+          data: %Data{data: data} = data_chunk,
+          format: %Format{bits_per_sample: bits_per_sample}
+        } = wave,
+        function
+      ) do
+    data =
+      case bits_per_sample do
+        8 -> map8(data, function)
+        16 -> map16(data, function)
+        24 -> map24(data, function)
+      end
+
+    %__MODULE__{wave | data: %Data{data_chunk | data: data}}
+  end
+
+  @spec map8(binary, (integer -> integer), binary) :: binary
+  defp map8(binary, function, acc \\ <<>>)
+
+  defp map8(<<sample, etc::binary>>, function, acc) do
+    map8(etc, function, <<function.(sample)>> <> acc)
+  end
+
+  defp map8(<<>>, _, acc), do: String.reverse(acc)
+
+  @spec map16(binary, (integer -> integer), binary) :: binary
+  defp map16(binary, function, acc \\ <<>>)
+
+  defp map16(<<sample::16-signed-little, etc::binary>>, function, acc) do
+    map16(etc, function, <<function.(sample)::16-signed-big>> <> acc)
+  end
+
+  defp map16(<<>>, _, acc), do: String.reverse(acc)
+
+  @spec map24(binary, (integer -> integer), binary) :: binary
+  defp map24(binary, function, acc \\ <<>>)
+
+  defp map24(<<sample::24-signed-little, etc::binary>>, function, acc) do
+    map24(etc, function, <<function.(sample)::24-signed-big>> <> acc)
+  end
+
+  defp map24(<<>>, _, acc), do: String.reverse(acc)
+
   @doc ~S"""
   Read LPCM WAVE data.
 

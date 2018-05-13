@@ -26,23 +26,17 @@ defmodule Wavex.Chunk.RIFF do
 
   ## Caveats
 
-  ### Chunk ID
-
   Bytes 1-4 must read `"RIFF"` to indicate the Resource Interchange File Format.
   A different value results in an error.
 
       iex> Wavex.Chunk.RIFF.read(<<"RIFX", 0, 0, 0, 0, "WAVE">>)
       {:error, %Wavex.Error.UnexpectedFourCC{expected: "RIFF", actual: "RIFX"}}
 
-  ### WAVE ID
-
   Bytes 9-12 must read `"WAVE"` to indicate a waveform audio file. A different
   value results in an error.
 
       iex> Wavex.Chunk.RIFF.read(<<"RIFF", 0, 0, 0, 0, "AVI ">>)
       {:error, %Wavex.Error.UnexpectedFourCC{expected: "WAVE", actual: "AVI "}}
-
-  ### Header size
 
   A binary must be at least 12 bytes to contain a RIFF header.
 
