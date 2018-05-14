@@ -13,7 +13,7 @@ defmodule Wavex.Chunk.RIFF do
   @type t :: %__MODULE__{size: pos_integer}
 
   @doc ~S"""
-  Read a RIFF header.
+  Read a RIFF chunk.
 
   ## Examples
 
@@ -38,7 +38,7 @@ defmodule Wavex.Chunk.RIFF do
       iex> Wavex.Chunk.RIFF.read(<<"RIFF", 0, 0, 0, 0, "AVI ">>)
       {:error, %Wavex.Error.UnexpectedFourCC{expected: "WAVE", actual: "AVI "}}
 
-  A binary must be at least 12 bytes to contain a RIFF header.
+  A binary must be at least 12 bytes to contain a RIFF chunk.
 
       iex> Wavex.Chunk.RIFF.read(<<"RIFF", 0, 0>>)
       {:error, %Wavex.Error.UnexpectedEOF{}}
