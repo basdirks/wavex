@@ -6,6 +6,7 @@ defmodule Wavex.Error do
   alias __MODULE__.{
     BlockAlignMismatch,
     ByteRateMismatch,
+    RIFFSizeMismatch,
     UnexpectedEOF,
     UnexpectedFormatSize,
     UnexpectedFourCC,
@@ -19,6 +20,7 @@ defmodule Wavex.Error do
   @type t ::
           BlockAlignMismatch.t()
           | ByteRateMismatch.t()
+          | RIFFSizeMismatch.t()
           | UnexpectedEOF.t()
           | UnexpectedFormatSize.t()
           | UnexpectedFourCC.t()
