@@ -76,7 +76,7 @@ defmodule Wavex.Chunk.Format do
 
   ## Example
 
-  Reading the format chunk of a 16-bit stereo 88.2kb/s LPCM file.
+  Reading the format chunk of a 16-bit stereo 88.2kb/s LPCM file:
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
@@ -98,7 +98,7 @@ defmodule Wavex.Chunk.Format do
   ## Caveats
 
   Bytes 1-4 must read `"fmt "` to indicate a format chunk. The following
-  example gives an error because bytes 1-4 read `"data"` instead of `"fmt "`.
+  example gives an error because bytes 1-4 read `"data"` instead of `"fmt "`:
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x64, 0x61, 0x74, 0x61, #  d     a     t     a
@@ -112,7 +112,7 @@ defmodule Wavex.Chunk.Format do
 
   The format size at bytes 5-8 is expected to be `16`, the format size for the
   LPCM format. The following example gives an error because the format size is
-  `18` instead of `16`.
+  `18` instead of `16`:
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
@@ -126,7 +126,7 @@ defmodule Wavex.Chunk.Format do
 
   The format at bytes 9-10 must be `0x0001` (LPCM), as other formats are not
   supported. The following example gives an error because the format is
-  `0x0032` instead of `0x0001`.
+  `0x0032` instead of `0x0001`:
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
@@ -140,7 +140,7 @@ defmodule Wavex.Chunk.Format do
 
   The format at bytes 11-12 must not be `0`, because there has to be at least
   one channel. The following example gives an error because the number of
-  channels is `0`.
+  channels is `0`:
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
@@ -154,7 +154,7 @@ defmodule Wavex.Chunk.Format do
 
   The byte rate at bytes 17-20 must be equal to `sample_rate * block_align`.
   The following example gives an error because `44100` is not equal to
-  `22050 * 4 = 88200`.
+  `22050 * 4 = 88200`:
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
@@ -168,7 +168,7 @@ defmodule Wavex.Chunk.Format do
 
   The block alignment at bytes 21-22 must be equal to
   `channels * bits_per_sample / 8`. The following example gives an error
-  because `2` is not equal to `2 * 16 / 8 = 4`.
+  because `2` is not equal to `2 * 16 / 8 = 4`:
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s
@@ -182,7 +182,7 @@ defmodule Wavex.Chunk.Format do
 
   The bits per second at bytes 23-24 must be `8`, `16`, or `24`, as other bit
   rates are not supported. The following example gives an error because the
-  bit rate is `32`.
+  bit rate is `32`:
 
       iex> Wavex.Chunk.Format.read(<<
       ...>   0x66, 0x6d, 0x74, 0x20, #  f     m     t     \s

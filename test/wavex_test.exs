@@ -9,28 +9,36 @@ defmodule WavexTest do
   alias Wavex.Error.{
     BlockAlignMismatch,
     ByteRateMismatch,
+    MissingChunks,
+    RIFFSizeMismatch,
     UnexpectedEOF,
     UnexpectedFormatSize,
     UnexpectedFourCC,
+    UnreadableDate,
+    UnreadableTime,
     UnsupportedBitsPerSample,
     UnsupportedFormat,
     ZeroChannels
   }
 
-  doctest Wavex
-  doctest Data
-  doctest Error
   doctest BlockAlignMismatch
   doctest ByteRateMismatch
+  doctest Data
+  doctest Error
+  doctest Format
+  doctest MissingChunks
+  doctest RIFF
+  doctest RIFFSizeMismatch
   doctest UnexpectedEOF
   doctest UnexpectedFormatSize
   doctest UnexpectedFourCC
+  doctest UnreadableDate
+  doctest UnreadableTime
   doctest UnsupportedBitsPerSample
   doctest UnsupportedFormat
-  doctest ZeroChannels
-  doctest Format
-  doctest RIFF
   doctest Utils
+  doctest Wavex
+  doctest ZeroChannels
 
   defp read(name) do
     "priv/#{name}.wav"

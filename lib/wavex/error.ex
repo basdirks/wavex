@@ -6,6 +6,7 @@ defmodule Wavex.Error do
   alias __MODULE__.{
     BlockAlignMismatch,
     ByteRateMismatch,
+    MissingChunks,
     RIFFSizeMismatch,
     UnexpectedEOF,
     UnexpectedFormatSize,
@@ -20,6 +21,7 @@ defmodule Wavex.Error do
   @type t ::
           BlockAlignMismatch.t()
           | ByteRateMismatch.t()
+          | MissingChunks.t()
           | RIFFSizeMismatch.t()
           | UnexpectedEOF.t()
           | UnexpectedFormatSize.t()
@@ -480,7 +482,7 @@ defmodule Wavex.Error do
       :actual
     ]
 
-    @type t :: %__MODULE__{expected: binary, actual: binary}
+    @type t :: %__MODULE__{expected: <<_::32>>, actual: <<_::32>>}
 
     defimpl String.Chars, for: __MODULE__ do
       def to_string(%UnexpectedFourCC{expected: expected, actual: actual}) do
@@ -490,7 +492,7 @@ defmodule Wavex.Error do
   end
 
   defmodule UnreadableDate do
-    @moduledoc """
+    @moduledoc ~S"""
     An unreadable date. Dates have to be of the form "yyyy-mm-dd", where the
     minus/hyphen may be any character.
 
@@ -513,7 +515,7 @@ defmodule Wavex.Error do
   end
 
   defmodule UnreadableTime do
-    @moduledoc """
+    @moduledoc ~S"""
     An unreadable time. Times have to be of the form "hh-mm-ss", where the
     minus/hyphen may be any character.
 
@@ -559,7 +561,29 @@ defmodule Wavex.Error do
 
     defimpl String.Chars, for: __MODULE__ do
       def to_string(%RIFFSizeMismatch{expected: expected, actual: actual}) do
-        "expected riff size #{expected}, got: #{actual}"
+        "expected RIFF size #{expected}, got: #{actual}"
+      end
+    end
+  end
+
+  defmodule MissingChunks do
+    @moduledoc ~S"""
+    Missing chunks.
+
+        iex> to_string(%Wavex.Error.MissingChunks{missing: [Wavex.Chunk.Data]})
+        "missing chunks: \"[Wavex.Chunk.Data]\""
+
+    """
+
+    @enforce_keys [:missing]
+
+    defstruct [:missing]
+
+    @type t :: %__MODULE__{missing: RIFF | Format | Data}
+
+    defimpl String.Chars, for: __MODULE__ do
+      def to_string(%MissingChunks{missing: missing}) do
+        "missing chunks: \"#{inspect(missing)}\""
       end
     end
   end
