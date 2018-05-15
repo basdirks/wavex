@@ -5,7 +5,7 @@ defmodule Wavex do
 
   alias Wavex.Chunk.{Data, Format, RIFF}
   alias Wavex.Error
-  alias Wavex.Error.{MissingChunks, RIFFSizeMismatch, UnexpectedEOF, UnknownFourCC}
+  alias Wavex.Error.{MissingChunks, RIFFSizeMismatch, UnexpectedEOF}
 
   @enforce_keys [
     :riff,
@@ -358,10 +358,8 @@ defmodule Wavex do
        }}
     
   WAVE data must start with a RIFF chunk, but the order of subsequent chunks
-  may vary:
-
-  Reading the same 16-bit mono 22050/s LPCM file as before, but with chunks
-  in a different order:
+  may vary. Reading the same 16-bit mono 22050/s LPCM file as before, but with
+  chunks in a different order:
 
       iex> Wavex.read(<<
       ...>   0x52, 0x49, 0x46, 0x46, #  R     I     F     F

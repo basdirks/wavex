@@ -4,7 +4,7 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.9.3",
+      version: "0.9.4",
       elixir: "~> 1.6",
       docs: docs(),
       description: "Read WAVE LPCM data",
@@ -29,6 +29,7 @@ defmodule Wavex.MixProject do
           Wavex.Error,
           Wavex.Error.BlockAlignMismatch,
           Wavex.Error.ByteRateMismatch,
+          Wavex.Error.MissingChunks,
           Wavex.Error.RIFFSizeMismatch,
           Wavex.Error.UnexpectedEOF,
           Wavex.Error.UnexpectedFormatSize,
