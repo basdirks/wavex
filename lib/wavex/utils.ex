@@ -3,7 +3,7 @@ defmodule Wavex.Utils do
   Miscellaneous utilities.
   """
 
-  alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
+  alias Wavex.Error.UnexpectedFourCC
 
   @doc """
   Verify a FourCC (four character code).
@@ -30,30 +30,20 @@ defmodule Wavex.Utils do
 
   ## Examples
 
-      iex> Wavex.Utils.read_until_null(5, <<1, 2, 3, 4, 5, 6, 7, 8, 9>>)
-      {:ok, <<1, 2, 3, 4, 5>>, <<6, 7, 8, 9>>}
+      iex> Wavex.Utils.take_until_null(<<1, 2, 3, 4, 5, 6, 7, 8, 9>>)
+      <<1, 2, 3, 4, 5, 6, 7, 8, 9>>
 
-      iex> Wavex.Utils.read_until_null(5, <<1, 2, 3, 4, 5, 6, 7, 8, 9>>)
-      {:ok, <<1, 2, 3, 4, 5>>, <<6, 7, 8, 9>>}
-
-      iex> Wavex.Utils.read_until_null(5, <<1, 2, 3>>)
-      {:error, %Wavex.Error.UnexpectedEOF{}}
+      iex> Wavex.Utils.take_until_null(<<1, 2, 0, 4, 5, 6, 7, 8, 9>>)
+      <<1, 2>>
 
   """
-  @spec read_until_null(non_neg_integer, binary) ::
-          {:ok, binary, binary} | {:error, UnexpectedEOF.t()}
-  def read_until_null(max_bytes, binary)
-      when is_integer(max_bytes) and max_bytes >= 0 and is_binary(binary) do
-    do_read_until_null(max_bytes, binary, <<>>)
+  @spec take_until_null(binary) :: binary
+  def take_until_null(binary) when is_binary(binary) do
+    do_take_until_null(binary)
   end
 
-  @spec do_read_until_null(non_neg_integer, binary, binary) ::
-          {:ok, binary, binary} | {:error, UnexpectedEOF.t()}
-  defp do_read_until_null(0, etc, read), do: {:ok, String.reverse(read), etc}
-  defp do_read_until_null(_, <<>>, _), do: {:error, %UnexpectedEOF{}}
-  defp do_read_until_null(_, <<0, _::binary>> = etc, read), do: {:ok, String.reverse(read), etc}
-
-  defp do_read_until_null(remaining_max_bytes, <<head, etc::binary>>, read) do
-    do_read_until_null(remaining_max_bytes - 1, etc, <<head>> <> read)
-  end
+  defp do_take_until_null(etc, read \\ <<>>)
+  defp do_take_until_null(<<>>, read), do: String.reverse(read)
+  defp do_take_until_null(<<0, _::binary>>, read), do: String.reverse(read)
+  defp do_take_until_null(<<h, etc::binary>>, read), do: do_take_until_null(etc, <<h>> <> read)
 end

@@ -4,7 +4,7 @@ defmodule WavexTest do
   use ExUnit.Case
 
   alias Wavex.{Error, Utils}
-  alias Wavex.Chunk.{Data, Format, RIFF}
+  alias Wavex.Chunk.{BAE, Data, Format, RIFF}
 
   alias Wavex.Error.{
     BlockAlignMismatch,
@@ -21,6 +21,7 @@ defmodule WavexTest do
     ZeroChannels
   }
 
+  doctest BAE
   doctest BlockAlignMismatch
   doctest ByteRateMismatch
   doctest Data
