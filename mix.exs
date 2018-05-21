@@ -4,7 +4,7 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.10.0",
+      version: "0.11.0",
       elixir: "~> 1.6",
       docs: docs(),
       description: "Read WAVE LPCM data",
@@ -41,7 +41,7 @@ defmodule Wavex.MixProject do
           Wavex.Error.UnexpectedFourCC,
           Wavex.Error.UnreadableDate,
           Wavex.Error.UnreadableTime,
-          Wavex.Error.UnsupportedBitsPerSample,
+          Wavex.Error.UnsupportedBitrate,
           Wavex.Error.UnsupportedFormat,
           Wavex.Error.ZeroChannels
         ]
@@ -51,6 +51,7 @@ defmodule Wavex.MixProject do
 
   defp deps do
     [
+      {:benchee, "~> 0.13.1", only: :dev},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8.2", only: :test},
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},

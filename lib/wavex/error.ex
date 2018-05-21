@@ -13,7 +13,7 @@ defmodule Wavex.Error do
     UnexpectedFourCC,
     UnreadableDate,
     UnreadableTime,
-    UnsupportedBitsPerSample,
+    UnsupportedBitrate,
     UnsupportedFormat,
     ZeroChannels
   }
@@ -28,20 +28,13 @@ defmodule Wavex.Error do
           | UnexpectedFourCC.t()
           | UnreadableDate.t()
           | UnreadableTime.t()
-          | UnsupportedBitsPerSample.t()
+          | UnsupportedBitrate.t()
           | UnsupportedFormat.t()
           | ZeroChannels.t()
 
   defmodule UnsupportedFormat do
     @moduledoc """
     An unsupported format. Currently, only 0x0001 (LPCM) is supported.
-
-        iex> to_string(%Wavex.Error.UnsupportedFormat{actual: 0x0000})
-        "expected format 1 (LPCM), got: 0 (UNKNOWN)"
-
-        iex> to_string(%Wavex.Error.UnsupportedFormat{actual: 0x0050})
-        "expected format 1 (LPCM), got: 80 (MPEG)"
-
     """
 
     @enforce_keys [:actual]
@@ -329,10 +322,6 @@ defmodule Wavex.Error do
   defmodule UnexpectedFormatSize do
     @moduledoc """
     An unexpected format size. A format size of 16 is expected.
-
-        iex> to_string(%Wavex.Error.UnexpectedFormatSize{actual: 18})
-        "expected format size 16, got: 18"
-
     """
 
     @enforce_keys [:actual]
@@ -348,14 +337,10 @@ defmodule Wavex.Error do
     end
   end
 
-  defmodule UnsupportedBitsPerSample do
+  defmodule UnsupportedBitrate do
     @moduledoc """
     An unsupported bits per sample value. Currently, only values of 8, 16,
     and 24 are supported.
-
-        iex> to_string(%Wavex.Error.UnsupportedBitsPerSample{actual: 32})
-        "expected bits per sample to be 8, 16, or 24, got: 32"
-
     """
 
     @enforce_keys [:actual]
@@ -365,7 +350,7 @@ defmodule Wavex.Error do
     @type t :: %__MODULE__{actual: non_neg_integer}
 
     defimpl String.Chars, for: __MODULE__ do
-      def to_string(%UnsupportedBitsPerSample{actual: actual}) do
+      def to_string(%UnsupportedBitrate{actual: actual}) do
         "expected bits per sample to be 8, 16, or 24, got: #{actual}"
       end
     end
@@ -374,10 +359,6 @@ defmodule Wavex.Error do
   defmodule ZeroChannels do
     @moduledoc """
     A channel value of 0. The number of channels must be positive.
-
-        iex> to_string(%Wavex.Error.ZeroChannels{})
-        "expected a positive number of channels"
-
     """
 
     defstruct []
@@ -392,10 +373,6 @@ defmodule Wavex.Error do
   defmodule UnexpectedEOF do
     @moduledoc """
     An unexpected end of file.
-
-        iex> to_string(%Wavex.Error.UnexpectedEOF{})
-        "expected more data, got an end of file"
-
     """
 
     defstruct []
@@ -410,10 +387,6 @@ defmodule Wavex.Error do
   defmodule BlockAlignMismatch do
     @moduledoc """
     A mismatched block align value.
-
-        iex> to_string(%Wavex.Error.BlockAlignMismatch{expected: 1, actual: 2})
-        "expected block align 1, got: 2"
-
     """
 
     @enforce_keys [
@@ -438,10 +411,6 @@ defmodule Wavex.Error do
   defmodule ByteRateMismatch do
     @moduledoc """
     A mismatched byte rate value.
-
-        iex> to_string(%Wavex.Error.ByteRateMismatch{expected: 44_100, actual: 88_200})
-        "expected byte rate 44100, got: 88200"
-
     """
 
     @enforce_keys [
@@ -466,10 +435,6 @@ defmodule Wavex.Error do
   defmodule UnexpectedFourCC do
     @moduledoc ~S"""
     An unexpected four character code.
-
-        iex> to_string(%Wavex.Error.UnexpectedFourCC{expected: "WAVE", actual: "DIVX"})
-        "expected FourCC \"WAVE\", got: \"DIVX\""
-
     """
 
     @enforce_keys [
@@ -495,10 +460,6 @@ defmodule Wavex.Error do
     @moduledoc ~S"""
     An unreadable date. Dates have to be of the form "yyyy-mm-dd", where the
     minus/hyphen may be any character.
-
-        iex> to_string(%Wavex.Error.UnreadableDate{actual: "2000-01   "})
-        "expected date to be of the form \"yyyy-mm-dd\", got: \"2000-01   \""
-
     """
 
     @enforce_keys [:actual]
@@ -518,10 +479,6 @@ defmodule Wavex.Error do
     @moduledoc ~S"""
     An unreadable time. Times have to be of the form "hh-mm-ss", where the
     minus/hyphen may be any character.
-
-        iex> to_string(%Wavex.Error.UnreadableTime{actual: "12-00   "})
-        "expected time to be of the form \"hh-mm-ss\", got: \"12-00   \""
-
     """
 
     @enforce_keys [:actual]
@@ -541,10 +498,6 @@ defmodule Wavex.Error do
     @moduledoc """
     A RIFF size that does not correspond to the file size. RIFF size must be
     equal to file size - 8.
-
-        iex> to_string(%Wavex.Error.RIFFSizeMismatch{expected: 202, actual: 200})
-        "expected RIFF size 202, got: 200"
-
     """
 
     @enforce_keys [
@@ -569,10 +522,6 @@ defmodule Wavex.Error do
   defmodule MissingChunks do
     @moduledoc ~S"""
     Missing chunks.
-
-        iex> to_string(%Wavex.Error.MissingChunks{missing: [Wavex.Chunk.Data]})
-        "missing chunks: \"[Wavex.Chunk.Data]\""
-
     """
 
     @enforce_keys [:missing]
