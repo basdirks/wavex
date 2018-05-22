@@ -3,8 +3,6 @@ defmodule Wavex.Chunk.Format do
   Read a format chunk.
   """
 
-  alias Wavex.Utils
-
   alias Wavex.Error.{
     BlockAlignMismatch,
     ByteRateMismatch,
@@ -15,6 +13,8 @@ defmodule Wavex.Chunk.Format do
     UnsupportedFormat,
     ZeroChannels
   }
+
+  alias Wavex.FourCC
 
   @enforce_keys [
     :channels,
@@ -39,6 +39,11 @@ defmodule Wavex.Chunk.Format do
           block_align: pos_integer,
           bits_per_sample: pos_integer
         }
+
+  @four_cc "fmt "
+
+  @spec four_cc :: FourCC.t()
+  def four_cc, do: @four_cc
 
   @spec verify_size(non_neg_integer) :: :ok | {:error, UnexpectedFormatSize.t()}
   defp verify_size(16), do: :ok
@@ -96,7 +101,7 @@ defmodule Wavex.Chunk.Format do
         bits_per_sample::16-little,
         etc::binary
       >>) do
-    with :ok <- Utils.verify_four_cc(fmt_id, "fmt "),
+    with :ok <- FourCC.verify(fmt_id, @four_cc),
          :ok <- verify_size(size),
          :ok <- verify_format(format),
          :ok <- verify_channels(channels),

@@ -3,39 +3,16 @@ defmodule WavexTest do
 
   use ExUnit.Case, async: true
 
-  alias Wavex.{Error, Utils}
-  alias Wavex.Chunk.{Data, Format, RIFF}
-
-  alias Wavex.Error.{
-    BlockAlignMismatch,
-    ByteRateMismatch,
-    MissingChunks,
-    RIFFSizeMismatch,
-    UnexpectedEOF,
-    UnexpectedFormatSize,
-    UnexpectedFourCC,
-    UnreadableDate,
-    UnreadableTime,
-    UnsupportedBitrate,
-    UnsupportedFormat,
-    ZeroChannels
+  alias Wavex.Chunk.{
+    Data,
+    Format,
+    RIFF
   }
 
-  doctest BlockAlignMismatch
-  doctest ByteRateMismatch
-  doctest Error
-  doctest MissingChunks
-  doctest RIFFSizeMismatch
-  doctest UnexpectedEOF
-  doctest UnexpectedFormatSize
-  doctest UnexpectedFourCC
-  doctest UnreadableDate
-  doctest UnreadableTime
-  doctest UnsupportedBitrate
-  doctest UnsupportedFormat
-  doctest Utils
-  doctest Wavex
-  doctest ZeroChannels
+  alias Wavex.Error.{
+    UnexpectedFormatSize,
+    UnsupportedFormat
+  }
 
   defp read(name) do
     "priv/#{name}.wav"

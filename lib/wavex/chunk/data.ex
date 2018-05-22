@@ -3,8 +3,12 @@ defmodule Wavex.Chunk.Data do
   Read a data chunk.
   """
 
-  alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
-  alias Wavex.Utils
+  alias Wavex.Error.{
+    UnexpectedEOF,
+    UnexpectedFourCC
+  }
+
+  alias Wavex.FourCC
 
   @enforce_keys [
     :size,
@@ -18,6 +22,11 @@ defmodule Wavex.Chunk.Data do
 
   @type t :: %__MODULE__{size: non_neg_integer, data: binary}
 
+  @four_cc "data"
+
+  @spec four_cc :: FourCC.t()
+  def four_cc, do: @four_cc
+
   @doc ~S"""
   Read a data chunk.
   """
@@ -28,7 +37,7 @@ defmodule Wavex.Chunk.Data do
         data::binary-size(size),
         etc::binary
       >>) do
-    with :ok <- Utils.verify_four_cc(data_id, "data") do
+    with :ok <- FourCC.verify(data_id, @four_cc) do
       {:ok, %__MODULE__{size: size, data: data}, etc}
     end
   end

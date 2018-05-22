@@ -4,18 +4,6 @@ defmodule Wavex.UtilsTest do
   use ExUnit.Case, async: true
 
   alias Wavex.Utils
-  alias Wavex.Error.UnexpectedFourCC
-
-  describe "verifying a FourCC" do
-    test "which was expected" do
-      assert Utils.verify_four_cc("RIFF", "RIFF") == :ok
-    end
-
-    test "which was unexpected" do
-      assert Utils.verify_four_cc("RIFX", "RIFF") ==
-               {:error, %UnexpectedFourCC{expected: "RIFF", actual: "RIFX"}}
-    end
-  end
 
   describe "taking bytes until null is encountered" do
     test "when there is no null byte present" do

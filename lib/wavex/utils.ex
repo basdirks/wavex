@@ -3,20 +3,7 @@ defmodule Wavex.Utils do
   Miscellaneous utilities.
   """
 
-  alias Wavex.Error.UnexpectedFourCC
-
   @doc """
-  Verify a FourCC (four character code).
-  """
-  @spec verify_four_cc(<<_::32>>, <<_::32>>) :: :ok | {:error, UnexpectedFourCC.t()}
-  def verify_four_cc(<<actual::binary-size(4)>>, <<expected::binary-size(4)>>) do
-    case actual do
-      ^expected -> :ok
-      _ -> {:error, %UnexpectedFourCC{expected: expected, actual: actual}}
-    end
-  end
-
-  @doc ~S"""
   Take bytes until null is encountered.
   """
   @spec take_until_null(binary) :: binary

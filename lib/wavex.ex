@@ -3,7 +3,7 @@ defmodule Wavex do
   Read LPCM WAVE data.
   """
 
-  alias Wavex.Chunk.{Data, Format, RIFF}
+  alias Wavex.Chunk.{BAE, Data, Format, RIFF}
   alias Wavex.Error
   alias Wavex.Error.{MissingChunks, RIFFSizeMismatch, UnexpectedEOF}
 
@@ -16,18 +16,21 @@ defmodule Wavex do
   defstruct [
     :riff,
     :format,
-    :data
+    :data,
+    :bae
   ]
 
   @type t :: %__MODULE__{
           riff: RIFF.t(),
           format: Format.t(),
-          data: Data.t()
+          data: Data.t(),
+          bae: BAE.t() | nil
         }
 
   @chunks %{
-    "fmt " => {Format, :format},
-    "data" => {Data, :data}
+    Format.four_cc() => {Format, :format},
+    Data.four_cc() => {Data, :data},
+    BAE.four_cc() => {BAE, :bae}
   }
 
   @spec map8(binary, (integer -> integer), binary) :: binary
@@ -131,9 +134,6 @@ defmodule Wavex do
 
     %__MODULE__{wave | data: %Data{data_chunk | data: data}}
   end
-
-  @spec size(t) :: non_neg_integer
-  def size(%Wavex{riff: %RIFF{size: size}}), do: size + 8
 
   @doc ~S"""
   Read LPCM WAVE data.
