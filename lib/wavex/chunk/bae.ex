@@ -169,7 +169,7 @@ defmodule Wavex.Chunk.BAE do
          max_short_term_loudness: max_short_term_loudness
        }, etc}
     else
-      binary when is_binary(binary) -> {:error, binary, String.length(binary)}
+      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
     end
   end
 

@@ -3,9 +3,20 @@ defmodule Wavex do
   Read LPCM WAVE data.
   """
 
-  alias Wavex.Chunk.{BAE, Data, Format, RIFF}
+  alias Wavex.Chunk.{
+    BAE,
+    Data,
+    Format,
+    RIFF
+  }
+
   alias Wavex.Error
-  alias Wavex.Error.{MissingChunks, RIFFSizeMismatch, UnexpectedEOF}
+
+  alias Wavex.Error.{
+    MissingChunks,
+    RIFFSizeMismatch,
+    UnexpectedEOF
+  }
 
   @enforce_keys [
     :riff,
