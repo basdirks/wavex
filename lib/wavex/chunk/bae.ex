@@ -1,6 +1,6 @@
 defmodule Wavex.Chunk.BAE do
   @moduledoc """
-  Read a Broadcast Audio Extension chunk.
+  A BAE (Broadcast Audio Extension) chunk.
   """
 
   alias Wavex.Error.{
@@ -12,7 +12,7 @@ defmodule Wavex.Chunk.BAE do
 
   alias Wavex.{
     FourCC,
-    Utils
+    ZSTR
   }
 
   @enforce_keys [
@@ -113,7 +113,7 @@ defmodule Wavex.Chunk.BAE do
   end
 
   @doc ~S"""
-  Read a Broadcast Audio Extension chunk.
+  Read a BAE chunk.
   """
   @spec read(binary) ::
           {:ok, t, binary}
@@ -153,9 +153,9 @@ defmodule Wavex.Chunk.BAE do
       {:ok,
        %__MODULE__{
          size: size,
-         description: Utils.take_until_null(description),
-         originator: Utils.take_until_null(originator),
-         originator_reference: Utils.take_until_null(originator_reference),
+         description: ZSTR.read(description),
+         originator: ZSTR.read(originator),
+         originator_reference: ZSTR.read(originator_reference),
          origination_date: date,
          origination_time: time,
          time_reference_low: time_reference_low,

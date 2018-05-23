@@ -1,6 +1,6 @@
 defmodule Wavex.Chunk.RIFF do
   @moduledoc """
-  Read a RIFF chunk.
+  A RIFF (Resource Interchange File Format) chunk.
   """
 
   alias Wavex.Error.{
@@ -22,6 +22,9 @@ defmodule Wavex.Chunk.RIFF do
   @spec four_cc :: FourCC.t()
   def four_cc, do: @four_cc
 
+  @doc """
+  Read a RIFF chunk.
+  """
   @spec read(binary) ::
           {:ok, t, binary}
           | {:error, UnexpectedEOF.t() | UnexpectedFourCC.t()}

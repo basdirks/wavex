@@ -115,7 +115,7 @@ defmodule Wavex do
   end
 
   @doc ~S"""
-  Map over the data of a `%Wavex{}` value.
+  Map over the data of a `Wavex` value.
   """
   @spec map(t, (integer -> integer)) :: t
   def map(

@@ -1,6 +1,6 @@
 defmodule Wavex.Chunk.Data do
   @moduledoc """
-  Read a data chunk.
+  A data chunk.
   """
 
   alias Wavex.Error.{

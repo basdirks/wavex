@@ -1,6 +1,6 @@
 defmodule Wavex.FourCC do
   @moduledoc """
-  A four character code, used to identify the subsequent chunk.
+  A FourCC (four character code).
   """
 
   alias Wavex.Error.UnexpectedFourCC

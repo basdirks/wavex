@@ -7,6 +7,18 @@ defmodule Wavex.FourCCTest do
   alias Wavex.Error.UnexpectedFourCC
 
   describe "verifying a FourCC" do
+    test "with a non-binary value" do
+      assert_raise FunctionClauseError, fn ->
+        FourCC.verify(1234, "fmt ")
+      end
+    end
+
+    test "with a binary size other than 32" do
+      assert_raise FunctionClauseError, fn ->
+        FourCC.verify("fmt", "fmt ")
+      end
+    end
+
     test "which was expected" do
       assert FourCC.verify("RIFF", "RIFF") == :ok
     end

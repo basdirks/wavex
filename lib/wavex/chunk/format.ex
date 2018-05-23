@@ -1,6 +1,6 @@
 defmodule Wavex.Chunk.Format do
   @moduledoc """
-  Read a format chunk.
+  A format chunk.
   """
 
   alias Wavex.Error.{
