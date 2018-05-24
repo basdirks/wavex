@@ -46,19 +46,19 @@ defmodule Wavex.Chunk.Format do
   def four_cc, do: @four_cc
 
   @spec verify_size(non_neg_integer) :: :ok | {:error, UnexpectedFormatSize.t()}
-  defp verify_size(16), do: :ok
+  defp verify_size(0x10), do: :ok
   defp verify_size(actual), do: {:error, %UnexpectedFormatSize{actual: actual}}
 
   @spec verify_format(non_neg_integer) :: :ok | {:error, UnsupportedFormat.t()}
-  defp verify_format(1), do: :ok
+  defp verify_format(0x01), do: :ok
   defp verify_format(actual), do: {:error, %UnsupportedFormat{actual: actual}}
 
   @spec verify_bits_per_sample(non_neg_integer) :: :ok | {:error, UnsupportedBitrate.t()}
-  defp verify_bits_per_sample(actual) when actual in [8, 16, 24], do: :ok
+  defp verify_bits_per_sample(actual) when actual in [0x08, 0x10, 0x18], do: :ok
   defp verify_bits_per_sample(actual), do: {:error, %UnsupportedBitrate{actual: actual}}
 
   @spec verify_channels(non_neg_integer) :: :ok | {:error, ZeroChannels.t()}
-  defp verify_channels(0), do: {:error, %ZeroChannels{}}
+  defp verify_channels(0x00), do: {:error, %ZeroChannels{}}
   defp verify_channels(_), do: :ok
 
   @spec verify_block_align(non_neg_integer, non_neg_integer) ::
@@ -106,7 +106,7 @@ defmodule Wavex.Chunk.Format do
          :ok <- verify_format(format),
          :ok <- verify_channels(channels),
          :ok <- verify_bits_per_sample(bits_per_sample),
-         :ok <- verify_block_align(channels * div(bits_per_sample, 8), block_align),
+         :ok <- verify_block_align(channels * div(bits_per_sample, 0x08), block_align),
          :ok <- verify_byte_rate(sample_rate * block_align, byte_rate) do
       {:ok,
        %__MODULE__{

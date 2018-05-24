@@ -10,12 +10,19 @@ defmodule Wavex do
     RIFF
   }
 
-  alias Wavex.Error
-
   alias Wavex.Error.{
+    BlockAlignMismatch,
+    ByteRateMismatch,
     MissingChunks,
     RIFFSizeMismatch,
-    UnexpectedEOF
+    UnexpectedEOF,
+    UnexpectedFormatSize,
+    UnexpectedFourCC,
+    UnreadableDate,
+    UnreadableTime,
+    UnsupportedBitrate,
+    UnsupportedFormat,
+    ZeroChannels
   }
 
   @enforce_keys [
@@ -38,13 +45,18 @@ defmodule Wavex do
           bae: BAE.t() | nil
         }
 
-  @chunks %{
+  @chunks_required %{
     Format.four_cc() => {Format, :format},
-    Data.four_cc() => {Data, :data},
+    Data.four_cc() => {Data, :data}
+  }
+
+  @chunks_optional %{
     BAE.four_cc() => {BAE, :bae}
   }
 
-  @spec map8(binary, (integer -> integer), binary) :: binary
+  @chunks Map.merge(@chunks_optional, @chunks_required)
+
+  @spec map8(binary, (non_neg_integer -> non_neg_integer), binary) :: binary
   defp map8(binary, function, acc \\ <<>>)
 
   defp map8(<<sample, etc::binary>>, function, acc),
@@ -81,7 +93,6 @@ defmodule Wavex do
 
   @spec read_chunks(binary, map) :: {:ok, map} | {:error, UnexpectedEOF.t()}
   defp read_chunks(binary, chunks \\ %{})
-
   defp read_chunks(<<>>, chunks), do: {:ok, chunks}
 
   defp read_chunks(<<four_cc::binary-size(4), etc::binary>> = binary, chunks) do
@@ -102,17 +113,24 @@ defmodule Wavex do
 
   @spec verify_riff_size(non_neg_integer, binary) :: :ok | {:error, RIFFSizeMismatch.t()}
   defp verify_riff_size(actual, binary) do
-    case byte_size(binary) - 8 do
+    case byte_size(binary) - 0x08 do
       ^actual -> :ok
       expected -> {:error, %RIFFSizeMismatch{expected: expected, actual: actual}}
     end
   end
 
   @spec verify_chunks(map) :: :ok | {:error, MissingChunks.t()}
-  defp verify_chunks(%{format: %Format{}, data: %Data{}}), do: :ok
-  defp verify_chunks(%{format: %Format{}}), do: {:error, %MissingChunks{missing: [Data]}}
-  defp verify_chunks(%{data: %Data{}}), do: {:error, %MissingChunks{missing: [Format]}}
-  defp verify_chunks(%{}), do: {:error, %MissingChunks{missing: [Data, Format]}}
+  defp verify_chunks(chunks) do
+    chunks_missing =
+      for {_, {module, key}} <- @chunks_required, !match?(%{^key => %^module{}}, chunks) do
+        module
+      end
+
+    case chunks_missing do
+      [] -> :ok
+      missing -> {:error, %MissingChunks{missing: missing}}
+    end
+  end
 
   @doc """
   The duration of a wave file in seconds.
@@ -138,9 +156,9 @@ defmodule Wavex do
       ) do
     data =
       case bits_per_sample do
-        8 -> map8(data, function)
-        16 -> map16(data, function)
-        24 -> map24(data, function)
+        0x08 -> map8(data, function)
+        0x10 -> map16(data, function)
+        0x18 -> map24(data, function)
       end
 
     %__MODULE__{wave | data: %Data{data_chunk | data: data}}
@@ -149,7 +167,21 @@ defmodule Wavex do
   @doc ~S"""
   Read LPCM WAVE data.
   """
-  @spec read(binary) :: {:ok, t} | {:error, Error.t()}
+  @spec read(binary) ::
+          {:ok, t}
+          | {:error,
+             BlockAlignMismatch.t()
+             | ByteRateMismatch.t()
+             | MissingChunks.t()
+             | RIFFSizeMismatch.t()
+             | UnexpectedEOF.t()
+             | UnexpectedFormatSize.t()
+             | UnexpectedFourCC.t()
+             | UnreadableDate.t()
+             | UnreadableTime.t()
+             | UnsupportedBitrate.t()
+             | UnsupportedFormat.t()
+             | ZeroChannels.t()}
   def read(binary) when is_binary(binary) do
     with {:ok, %RIFF{size: riff_size} = riff, etc} <- RIFF.read(binary),
          :ok <- verify_riff_size(riff_size, binary),

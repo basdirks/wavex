@@ -141,7 +141,7 @@ defmodule Wavex.Chunk.BAE do
         max_short_term_loudness::16-signed-little,
         etc::binary
       >>) do
-    skip_bytes = size - 422
+    skip_bytes = size - 0x01A6
 
     with :ok <- FourCC.verify(bext_id, @four_cc),
          {:ok, date} <- date(date_binary),

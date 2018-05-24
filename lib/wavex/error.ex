@@ -18,20 +18,6 @@ defmodule Wavex.Error do
     ZeroChannels
   }
 
-  @type t ::
-          BlockAlignMismatch.t()
-          | ByteRateMismatch.t()
-          | MissingChunks.t()
-          | RIFFSizeMismatch.t()
-          | UnexpectedEOF.t()
-          | UnexpectedFormatSize.t()
-          | UnexpectedFourCC.t()
-          | UnreadableDate.t()
-          | UnreadableTime.t()
-          | UnsupportedBitrate.t()
-          | UnsupportedFormat.t()
-          | ZeroChannels.t()
-
   defmodule UnsupportedFormat do
     @moduledoc """
     An unsupported format. Currently, only 1 (LPCM) is supported.
