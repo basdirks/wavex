@@ -42,6 +42,9 @@ defmodule Wavex.Chunk.Format do
 
   @four_cc "fmt "
 
+  @doc """
+  The ID that identifies a format chunk.
+  """
   @spec four_cc :: FourCC.t()
   def four_cc, do: @four_cc
 
@@ -90,18 +93,19 @@ defmodule Wavex.Chunk.Format do
              | UnsupportedBitrate.t()
              | UnsupportedFormat.t()
              | ZeroChannels.t()}
-  def read(<<
-        fmt_id::binary-size(4),
-        size::32-little,
-        format::16-little,
-        channels::16-little,
-        sample_rate::32-little,
-        byte_rate::32-little,
-        block_align::16-little,
-        bits_per_sample::16-little,
-        etc::binary
-      >>) do
-    with :ok <- FourCC.verify(fmt_id, @four_cc),
+  def read(binary) do
+    with <<
+           fmt_id::binary-size(4),
+           size::32-little,
+           format::16-little,
+           channels::16-little,
+           sample_rate::32-little,
+           byte_rate::32-little,
+           block_align::16-little,
+           bits_per_sample::16-little,
+           etc::binary
+         >> <- binary,
+         :ok <- FourCC.verify(fmt_id, @four_cc),
          :ok <- verify_size(size),
          :ok <- verify_format(format),
          :ok <- verify_channels(channels),
@@ -116,8 +120,9 @@ defmodule Wavex.Chunk.Format do
          channels: channels,
          sample_rate: sample_rate
        }, etc}
+    else
+      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+      error -> error
     end
   end
-
-  def read(binary) when is_binary(binary), do: {:error, %UnexpectedEOF{}}
 end

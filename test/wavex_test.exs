@@ -85,18 +85,18 @@ defmodule WavexTest do
 
       assert match?(
                %Wavex{
-                 data: %Wavex.Chunk.Data{
+                 data: %Data{
                    data: _,
                    size: 18_510
                  },
-                 format: %Wavex.Chunk.Format{
+                 format: %Format{
                    bits_per_sample: 16,
                    block_align: 2,
                    byte_rate: 88_200,
                    channels: 1,
                    sample_rate: 44_100
                  },
-                 riff: %Wavex.Chunk.RIFF{size: 18_546}
+                 riff: %RIFF{size: 18_546}
                },
                wave
              )
@@ -107,18 +107,18 @@ defmodule WavexTest do
 
       assert match?(
                %Wavex{
-                 data: %Wavex.Chunk.Data{
+                 data: %Data{
                    data: _,
                    size: 25_600
                  },
-                 format: %Wavex.Chunk.Format{
+                 format: %Format{
                    bits_per_sample: 16,
                    block_align: 4,
                    byte_rate: 176_400,
                    channels: 2,
                    sample_rate: 44_100
                  },
-                 riff: %Wavex.Chunk.RIFF{size: 25_916}
+                 riff: %RIFF{size: 25_916}
                },
                wave
              )
@@ -129,18 +129,38 @@ defmodule WavexTest do
 
       assert match?(
                %Wavex{
-                 data: %Wavex.Chunk.Data{
+                 data: %Data{
                    data: _,
                    size: 164_160
                  },
-                 format: %Wavex.Chunk.Format{
+                 format: %Format{
                    bits_per_sample: 24,
                    block_align: 6,
                    byte_rate: 264_600,
                    channels: 2,
                    sample_rate: 44_100
                  },
-                 riff: %Wavex.Chunk.RIFF{size: 164_304}
+                 riff: %RIFF{size: 164_304}
+               },
+               wave
+             )
+    end
+
+    test "" do
+      {:ok, wave} = read("Alesis-Sanctuary-QCard-Crickets")
+
+      assert match?(
+               %Wavex{
+                 bae: nil,
+                 data: %Data{data: <<187, 255, 173, 255>>, size: 4},
+                 format: %Format{
+                   bits_per_sample: 16,
+                   block_align: 4,
+                   byte_rate: 176_400,
+                   channels: 2,
+                   sample_rate: 44_100
+                 },
+                 riff: %RIFF{size: 158}
                },
                wave
              )
@@ -169,18 +189,18 @@ defmodule WavexTest do
       assert Wavex.read(binary) ==
                {:ok,
                 %Wavex{
-                  data: %Wavex.Chunk.Data{
+                  data: %Data{
                     data: <<0, 0, 0, 0, 0, 0, 0, 0>>,
                     size: 8
                   },
-                  format: %Wavex.Chunk.Format{
+                  format: %Format{
                     bits_per_sample: 16,
                     block_align: 4,
                     byte_rate: 88_200,
                     channels: 2,
                     sample_rate: 22_050
                   },
-                  riff: %Wavex.Chunk.RIFF{size: 44}
+                  riff: %RIFF{size: 44}
                 }}
     end
 
@@ -208,15 +228,15 @@ defmodule WavexTest do
       assert Wavex.read(binary) ==
                {:ok,
                 %Wavex{
-                  data: %Wavex.Chunk.Data{data: <<0, 0, 254, 255>>, size: 4},
-                  format: %Wavex.Chunk.Format{
+                  data: %Data{data: <<0, 0, 254, 255>>, size: 4},
+                  format: %Format{
                     bits_per_sample: 16,
                     block_align: 2,
                     byte_rate: 22_050,
                     channels: 1,
                     sample_rate: 11_025
                   },
-                  riff: %Wavex.Chunk.RIFF{size: 40}
+                  riff: %RIFF{size: 40}
                 }}
     end
 
@@ -244,15 +264,15 @@ defmodule WavexTest do
       assert Wavex.read(binary) ==
                {:ok,
                 %Wavex{
-                  data: %Wavex.Chunk.Data{data: <<0, 0, 254, 255>>, size: 4},
-                  format: %Wavex.Chunk.Format{
+                  data: %Data{data: <<0, 0, 254, 255>>, size: 4},
+                  format: %Format{
                     bits_per_sample: 16,
                     block_align: 2,
                     byte_rate: 22_050,
                     channels: 1,
                     sample_rate: 11_025
                   },
-                  riff: %Wavex.Chunk.RIFF{size: 40}
+                  riff: %RIFF{size: 40}
                 }}
     end
   end
@@ -260,21 +280,21 @@ defmodule WavexTest do
   describe "calculating the duration of a Wavex value" do
     test "of 100000 samples at 88200b/s" do
       wave = %Wavex{
-        data: %Wavex.Chunk.Data{
+        data: %Data{
           data:
             0
             |> List.duplicate(100_000)
             |> List.to_string(),
           size: 100_000
         },
-        format: %Wavex.Chunk.Format{
+        format: %Format{
           bits_per_sample: 8,
           block_align: 2,
           byte_rate: 88_200,
           channels: 2,
           sample_rate: 44_100
         },
-        riff: %Wavex.Chunk.RIFF{size: 100_036}
+        riff: %RIFF{size: 100_036}
       }
 
       assert Wavex.duration(wave) == 1.1337868480725624
@@ -282,21 +302,21 @@ defmodule WavexTest do
 
     test "for 100000 samples at 176400b/s." do
       wave = %Wavex{
-        data: %Wavex.Chunk.Data{
+        data: %Data{
           data:
             0
             |> List.duplicate(100_000)
             |> List.to_string(),
           size: 100_000
         },
-        format: %Wavex.Chunk.Format{
+        format: %Format{
           bits_per_sample: 16,
           block_align: 4,
           byte_rate: 176_400,
           channels: 2,
           sample_rate: 44_100
         },
-        riff: %Wavex.Chunk.RIFF{size: 100_036}
+        riff: %RIFF{size: 100_036}
       }
 
       assert Wavex.duration(wave) == 0.5668934240362812

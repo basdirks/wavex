@@ -24,13 +24,7 @@ defmodule Wavex.Chunk.BAE do
     :origination_time,
     :time_reference_low,
     :time_reference_high,
-    :version,
-    :umid,
-    :loudness_value,
-    :loudness_range,
-    :max_true_peak_level,
-    :max_momentary_loudness,
-    :max_short_term_loudness
+    :version
   ]
 
   defstruct [
@@ -61,16 +55,19 @@ defmodule Wavex.Chunk.BAE do
           time_reference_low: non_neg_integer,
           time_reference_high: non_neg_integer,
           version: non_neg_integer,
-          umid: <<_::512>>,
-          loudness_value: integer,
-          loudness_range: integer,
-          max_true_peak_level: integer,
-          max_momentary_loudness: integer,
-          max_short_term_loudness: integer
+          umid: <<_::512>> | nil,
+          loudness_value: integer | nil,
+          loudness_range: integer | nil,
+          max_true_peak_level: integer | nil,
+          max_momentary_loudness: integer | nil,
+          max_short_term_loudness: integer | nil
         }
 
   @four_cc "bext"
 
+  @doc """
+  The ID that identifies a BAE chunk.
+  """
   @spec four_cc :: FourCC.t()
   def four_cc, do: @four_cc
 
@@ -112,6 +109,61 @@ defmodule Wavex.Chunk.BAE do
     end
   end
 
+  defp read_v0(%__MODULE__{size: size} = chunk, etc) do
+    skip_bytes = size - 348
+
+    with <<
+           _::binary-size(skip_bytes),
+           etc::binary
+         >> <- etc do
+      {:ok, chunk, etc}
+    else
+      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+    end
+  end
+
+  defp read_v1(%__MODULE__{size: size} = chunk, etc) do
+    skip_bytes = size - 412
+
+    with <<
+           umid::binary-size(64),
+           _::binary-size(skip_bytes),
+           etc::binary
+         >> <- etc do
+      {:ok, %__MODULE__{chunk | umid: umid}, etc}
+    else
+      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+    end
+  end
+
+  defp read_v2(%__MODULE__{size: size} = chunk, etc) do
+    skip_bytes = size - 422
+
+    with <<
+           umid::binary-size(64),
+           loudness_value::16-signed-little,
+           loudness_range::16-signed-little,
+           max_true_peak_level::16-signed-little,
+           max_momentary_loudness::16-signed-little,
+           max_short_term_loudness::16-signed-little,
+           _::binary-size(skip_bytes),
+           etc::binary
+         >> <- etc do
+      {:ok,
+       %__MODULE__{
+         chunk
+         | umid: umid,
+           loudness_value: loudness_value,
+           loudness_range: loudness_range,
+           max_true_peak_level: max_true_peak_level,
+           max_momentary_loudness: max_momentary_loudness,
+           max_short_term_loudness: max_short_term_loudness
+       }, etc}
+    else
+      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+    end
+  end
+
   @doc ~S"""
   Read a BAE chunk.
   """
@@ -122,56 +174,44 @@ defmodule Wavex.Chunk.BAE do
              | UnexpectedFourCC.t()
              | UnreadableDate.t()
              | UnreadableTime.t()}
-  def read(<<
-        bext_id::binary-size(4),
-        size::32-little,
-        description::binary-size(256),
-        originator::binary-size(32),
-        originator_reference::binary-size(32),
-        date_binary::binary-size(10),
-        time_binary::binary-size(8),
-        time_reference_low::32-little,
-        time_reference_high::32-little,
-        version::16-little,
-        umid::binary-size(64),
-        loudness_value::16-signed-little,
-        loudness_range::16-signed-little,
-        max_true_peak_level::16-signed-little,
-        max_momentary_loudness::16-signed-little,
-        max_short_term_loudness::16-signed-little,
-        etc::binary
-      >>) do
-    skip_bytes = size - 0x01A6
-
-    with :ok <- FourCC.verify(bext_id, @four_cc),
+  def read(binary) do
+    with <<
+           bext_id::binary-size(4),
+           size::32-little,
+           description::binary-size(256),
+           originator::binary-size(32),
+           originator_reference::binary-size(32),
+           date_binary::binary-size(10),
+           time_binary::binary-size(8),
+           time_reference_low::32-little,
+           time_reference_high::32-little,
+           version::16-little,
+           etc::binary
+         >> <- binary,
+         :ok <- FourCC.verify(bext_id, @four_cc),
          {:ok, date} <- date(date_binary),
          {:ok, time} <- time(time_binary),
-         <<
-           _::binary-size(skip_bytes),
-           etc::binary
-         >> <- etc do
-      {:ok,
-       %__MODULE__{
-         size: size,
-         description: ZSTR.read(description),
-         originator: ZSTR.read(originator),
-         originator_reference: ZSTR.read(originator_reference),
-         origination_date: date,
-         origination_time: time,
-         time_reference_low: time_reference_low,
-         time_reference_high: time_reference_high,
-         version: version,
-         umid: umid,
-         loudness_value: loudness_value,
-         loudness_range: loudness_range,
-         max_true_peak_level: max_true_peak_level,
-         max_momentary_loudness: max_momentary_loudness,
-         max_short_term_loudness: max_short_term_loudness
-       }, etc}
+         chunk <- %__MODULE__{
+           size: size,
+           description: ZSTR.read(description),
+           originator: ZSTR.read(originator),
+           originator_reference: ZSTR.read(originator_reference),
+           origination_date: date,
+           origination_time: time,
+           time_reference_low: time_reference_low,
+           time_reference_high: time_reference_high,
+           version: version
+         },
+         {:ok, _, _} = result <-
+           (case version do
+              0x00 -> read_v0(chunk, etc)
+              0x01 -> read_v1(chunk, etc)
+              0x02 -> read_v2(chunk, etc)
+            end) do
+      result
     else
       binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+      error -> error
     end
   end
-
-  def read(binary) when is_binary(binary), do: {:error, %UnexpectedEOF{}}
 end
