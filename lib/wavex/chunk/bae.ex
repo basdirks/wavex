@@ -12,7 +12,7 @@ defmodule Wavex.Chunk.BAE do
 
   alias Wavex.{
     FourCC,
-    ZSTR
+    CString
   }
 
   @enforce_keys [
@@ -193,9 +193,9 @@ defmodule Wavex.Chunk.BAE do
          {:ok, time} <- time(time_binary),
          chunk <- %__MODULE__{
            size: size,
-           description: ZSTR.read(description),
-           originator: ZSTR.read(originator),
-           originator_reference: ZSTR.read(originator_reference),
+           description: CString.read(description),
+           originator: CString.read(originator),
+           originator_reference: CString.read(originator_reference),
            origination_date: date,
            origination_time: time,
            time_reference_low: time_reference_low,

@@ -2,53 +2,72 @@ defmodule Wavex.Chunk.RIFFTest do
   @moduledoc false
 
   use ExUnit.Case, async: true
+  use ExUnitProperties
 
   alias Wavex.Chunk.RIFF
   alias Wavex.Error.{UnexpectedEOF, UnexpectedFourCC}
 
+  @max_32bit 2
+             |> :math.pow(32)
+             |> round()
+
   describe "reading a RIFF chunk" do
-    test "from an empty binary" do
-      assert RIFF.read("") == {:error, %UnexpectedEOF{}}
+    property "from a binary starting with a valid RIFF chunk" do
+      check all size <- StreamData.integer(0..@max_32bit),
+                etc <- StreamData.binary() do
+        binary = <<
+          "RIFF",
+          size::32-little,
+          "WAVE",
+          etc::binary
+        >>
+
+        assert RIFF.read(binary) == {:ok, %RIFF{size: size}, etc}
+      end
     end
 
-    test "from the smallest correct binary" do
-      binary = <<
-        "RIFF",
-        <<0x00, 0x00, 0x00, 0x00>>,
-        "WAVE"
-      >>
+    property "without a RIFF id" do
+      check all size <- StreamData.integer(0..@max_32bit),
+                id <- StreamData.binary(length: 4),
+                id != "RIFF" do
+        binary =
+          id <>
+            <<
+              size::32-little,
+              "WAVE"
+            >>
 
-      assert RIFF.read(binary) == {:ok, %RIFF{size: 0}, ""}
+        assert RIFF.read(binary) == {:error, %UnexpectedFourCC{expected: "RIFF", actual: id}}
+      end
     end
 
-    test "without a RIFF id" do
-      binary = <<
-        "RIFX",
-        <<0x00, 0x00, 0x00, 0x00>>,
-        "WAVE"
-      >>
+    property "without a WAVE id" do
+      check all size <- StreamData.integer(0..@max_32bit),
+                id <- StreamData.binary(length: 4),
+                id != "WAVE" do
+        binary =
+          <<
+            "RIFF",
+            size::32-little
+          >> <> id
 
-      assert RIFF.read(binary) == {:error, %UnexpectedFourCC{expected: "RIFF", actual: "RIFX"}}
+        assert RIFF.read(binary) == {:error, %UnexpectedFourCC{expected: "WAVE", actual: id}}
+      end
     end
 
-    test "without a WAVE id" do
-      binary = <<
-        "RIFF",
-        <<0x00, 0x00, 0x00, 0x00>>,
-        "DIVX"
-      >>
+    property "of less than 12 bytes" do
+      check all size <- StreamData.integer(0..@max_32bit),
+                length <- StreamData.integer(0..11) do
+        binary = <<
+          "RIFF",
+          size::32-little,
+          "WAVE"
+        >>
 
-      assert RIFF.read(binary) == {:error, %UnexpectedFourCC{expected: "WAVE", actual: "DIVX"}}
-    end
+        part = :binary.part(binary, 0, length)
 
-    test "of less than 12 bytes" do
-      binary = <<
-        "RIFF",
-        <<0x00, 0x00, 0x00, 0x00>>,
-        "WAV"
-      >>
-
-      assert RIFF.read(binary) == {:error, %UnexpectedEOF{}}
+        assert RIFF.read(part) == {:error, %UnexpectedEOF{}}
+      end
     end
   end
 end

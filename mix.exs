@@ -4,7 +4,7 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.15.0",
+      version: "0.16.0",
       elixir: "~> 1.6",
       docs: docs(),
       description: "Read WAVE LPCM data",
@@ -31,7 +31,6 @@ defmodule Wavex.MixProject do
           Wavex.Chunk.RIFF
         ],
         Errors: [
-          Wavex.Error,
           Wavex.Error.BlockAlignMismatch,
           Wavex.Error.ByteRateMismatch,
           Wavex.Error.MissingChunks,
@@ -51,6 +50,7 @@ defmodule Wavex.MixProject do
 
   defp deps do
     [
+      {:stream_data, "~> 0.1", only: :test},
       {:benchee, "~> 0.13.1", only: :dev},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8.2", only: :test},

@@ -2,30 +2,26 @@ defmodule Wavex.FourCCTest do
   @moduledoc false
 
   use ExUnit.Case, async: true
+  use ExUnitProperties
 
   alias Wavex.FourCC
   alias Wavex.Error.UnexpectedFourCC
 
+  def four_cc_generator, do: StreamData.string(?A..?Z, length: 4)
+
   describe "verifying a FourCC" do
-    test "with a non-binary value" do
-      assert_raise FunctionClauseError, fn ->
-        FourCC.verify(1234, "fmt ")
+    property "FourCC.verify(a, b) always returns an error tuple if a != b" do
+      check all a <- four_cc_generator(),
+                b <- four_cc_generator(),
+                a != b do
+        assert FourCC.verify(a, b) == {:error, %UnexpectedFourCC{expected: b, actual: a}}
       end
     end
 
-    test "with a binary size other than 32" do
-      assert_raise FunctionClauseError, fn ->
-        FourCC.verify("fmt", "fmt ")
+    property "FourCC.verify(a, b) always returns :ok if a == b" do
+      check all a <- four_cc_generator() do
+        assert FourCC.verify(a, a) == :ok
       end
-    end
-
-    test "which was expected" do
-      assert FourCC.verify("RIFF", "RIFF") == :ok
-    end
-
-    test "which was unexpected" do
-      assert FourCC.verify("RIFX", "RIFF") ==
-               {:error, %UnexpectedFourCC{expected: "RIFF", actual: "RIFX"}}
     end
   end
 end
