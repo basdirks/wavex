@@ -6,20 +6,22 @@ defmodule Wavex.CStringTest do
 
   alias Wavex.CString
 
-  describe "reading a null-terminated string is encountered" do
-    property "CString.read(a) == a if a does not contain a null byte" do
-      check all a <- StreamData.binary(),
-                not String.contains?(a, <<0>>) do
-        assert CString.read(a) == a
-      end
+  def unterminated do
+    ExUnitProperties.gen all binary <- StreamData.binary(),
+                             not String.contains?(binary, <<0>>) do
+      binary
     end
+  end
 
-    property "CString.read(a <> <<0>>) == a if does not contain a null byte" do
-      check all a <- StreamData.binary(),
-                not String.contains?(a, <<0>>),
-                b = a <> <<0>> do
-        assert CString.read(b) == a
-      end
+  property "CString.read(a) == a if a does not contain a null byte" do
+    check all binary <- unterminated() do
+      assert CString.read(binary) == binary
+    end
+  end
+
+  property "CString.read(binary <> <<0>>) == binary if binary does not contain a null byte" do
+    check all binary <- unterminated() do
+      assert CString.read(binary <> <<0>>) == binary
     end
   end
 end
