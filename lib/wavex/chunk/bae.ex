@@ -3,13 +3,6 @@ defmodule Wavex.Chunk.BAE do
   A BAE (Broadcast Audio Extension) chunk.
   """
 
-  alias Wavex.Error.{
-    UnexpectedEOF,
-    UnexpectedFourCC,
-    UnreadableDate,
-    UnreadableTime
-  }
-
   alias Wavex.{
     FourCC,
     CString
@@ -63,6 +56,10 @@ defmodule Wavex.Chunk.BAE do
           max_short_term_loudness: integer | nil
         }
 
+  @type date_binary :: <<_::80>>
+
+  @type time_binary :: <<_::64>>
+
   @four_cc "bext"
 
   @doc """
@@ -71,7 +68,7 @@ defmodule Wavex.Chunk.BAE do
   @spec four_cc :: FourCC.t()
   def four_cc, do: @four_cc
 
-  @spec date(<<_::80>>) :: {:ok, Date.t()} | {:error, UnreadableDate.t()}
+  @spec date(date_binary) :: {:ok, Date.t()} | {:error, :unreadable_date, date_binary}
   defp date(
          <<
            year_binary::binary-size(4),
@@ -86,11 +83,11 @@ defmodule Wavex.Chunk.BAE do
          {day, ""} <- Integer.parse(day_binary) do
       Date.new(year, month, day)
     else
-      _ -> {:error, %UnreadableDate{actual: binary}}
+      _ -> {:error, {:unreadable_date, binary}}
     end
   end
 
-  @spec time(<<_::64>>) :: {:ok, Time.t()} | {:error, UnreadableTime.t()}
+  @spec time(time_binary) :: {:ok, Time.t()} | {:error, :unreadable_time, time_binary}
   defp time(
          <<
            hour_binary::binary-size(2),
@@ -105,7 +102,7 @@ defmodule Wavex.Chunk.BAE do
          {second, ""} <- Integer.parse(second_binary) do
       Time.new(hour, minute, second)
     else
-      _ -> {:error, %UnreadableTime{actual: binary}}
+      _ -> {:error, {:unreadable_time, %{actual: binary}}}
     end
   end
 
@@ -118,7 +115,7 @@ defmodule Wavex.Chunk.BAE do
          >> <- etc do
       {:ok, chunk, etc}
     else
-      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+      binary when is_binary(binary) -> {:error, :unexpected_eof}
     end
   end
 
@@ -126,13 +123,15 @@ defmodule Wavex.Chunk.BAE do
     skip_bytes = size - 412
 
     with <<
+           # 356 - 419
            umid::binary-size(64),
+           # 420 - ...
            _::binary-size(skip_bytes),
            etc::binary
          >> <- etc do
       {:ok, %__MODULE__{chunk | umid: umid}, etc}
     else
-      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+      binary when is_binary(binary) -> {:error, :unexpected_eof}
     end
   end
 
@@ -140,12 +139,19 @@ defmodule Wavex.Chunk.BAE do
     skip_bytes = size - 422
 
     with <<
+           # 356 - 419
            umid::binary-size(64),
+           # 420 - 421
            loudness_value::16-signed-little,
+           # 422 - 423
            loudness_range::16-signed-little,
+           # 424 - 425
            max_true_peak_level::16-signed-little,
+           # 426 - 427
            max_momentary_loudness::16-signed-little,
+           # 428 - 429
            max_short_term_loudness::16-signed-little,
+           # 430 - ...
            _::binary-size(skip_bytes),
            etc::binary
          >> <- etc do
@@ -160,7 +166,7 @@ defmodule Wavex.Chunk.BAE do
            max_short_term_loudness: max_short_term_loudness
        }, etc}
     else
-      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+      binary when is_binary(binary) -> {:error, :unexpected_eof}
     end
   end
 
@@ -170,21 +176,32 @@ defmodule Wavex.Chunk.BAE do
   @spec read(binary) ::
           {:ok, t, binary}
           | {:error,
-             UnexpectedEOF.t()
-             | UnexpectedFourCC.t()
-             | UnreadableDate.t()
-             | UnreadableTime.t()}
+             :unexpected_eof
+             | {:unexpected_four_cc, %{actual: FourCC.t(), expected: FourCC.t()}}
+             | {:unreadable_date, date_binary}
+             | {:unreadable_time, time_binary}
+             | {:unsupported_bae_version, non_neg_integer}}
   def read(binary) do
     with <<
+           # 0 - 3
            bext_id::binary-size(4),
+           # 4 - 7
            size::32-little,
+           # 8 - 263
            description::binary-size(256),
+           # 264 - 295
            originator::binary-size(32),
+           # 296 - 327
            originator_reference::binary-size(32),
+           # 328 - 337
            date_binary::binary-size(10),
+           # 338 - 345
            time_binary::binary-size(8),
+           # 346 - 349
            time_reference_low::32-little,
+           # 350 - 353
            time_reference_high::32-little,
+           # 354 - 355
            version::16-little,
            etc::binary
          >> <- binary,
@@ -207,10 +224,11 @@ defmodule Wavex.Chunk.BAE do
               0x00 -> read_v0(chunk, etc)
               0x01 -> read_v1(chunk, etc)
               0x02 -> read_v2(chunk, etc)
+              _ -> {:error, {:unsupported_bae_version, version}}
             end) do
       result
     else
-      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+      binary when is_binary(binary) -> {:error, :unexpected_eof}
       error -> error
     end
   end

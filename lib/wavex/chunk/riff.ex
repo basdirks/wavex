@@ -3,11 +3,6 @@ defmodule Wavex.Chunk.RIFF do
   A RIFF (Resource Interchange File Format) chunk.
   """
 
-  alias Wavex.Error.{
-    UnexpectedEOF,
-    UnexpectedFourCC
-  }
-
   alias Wavex.FourCC
 
   @enforce_keys [:size]
@@ -28,11 +23,18 @@ defmodule Wavex.Chunk.RIFF do
   @doc """
   Read a RIFF chunk.
   """
-  @spec read(binary) :: {:ok, t, binary} | {:error, UnexpectedEOF.t() | UnexpectedFourCC.t()}
+  @spec read(binary) ::
+          {:ok, t, binary}
+          | {:error,
+             :unexpected_eof
+             | {:unexpected_four_cc, %{actual: FourCC.t(), expected: FourCC.t()}}}
   def read(binary) do
     with <<
+           # 0 - 3
            riff_id::binary-size(4),
+           # 4 - 7
            size::32-little,
+           # 8 - 11
            wave_id::binary-size(4),
            etc::binary
          >> <- binary,
@@ -40,7 +42,7 @@ defmodule Wavex.Chunk.RIFF do
          :ok <- FourCC.verify(wave_id, @four_cc_wave) do
       {:ok, %__MODULE__{size: size}, etc}
     else
-      binary when is_binary(binary) -> {:error, %UnexpectedEOF{}}
+      binary when is_binary(binary) -> {:error, :unexpected_eof}
       error -> error
     end
   end

@@ -4,7 +4,7 @@ defmodule Wavex.MixProject do
   def project do
     [
       app: :wavex,
-      version: "0.16.0",
+      version: "0.17.0",
       elixir: "~> 1.6",
       docs: docs(),
       description: "Read WAVE LPCM data",
@@ -22,29 +22,7 @@ defmodule Wavex.MixProject do
 
   defp docs do
     [
-      extras: [{"README.md", title: "Readme"}],
-      groups_for_modules: [
-        Chunks: [
-          Wavex.Chunk.BAE,
-          Wavex.Chunk.Data,
-          Wavex.Chunk.Format,
-          Wavex.Chunk.RIFF
-        ],
-        Errors: [
-          Wavex.Error.BlockAlignMismatch,
-          Wavex.Error.ByteRateMismatch,
-          Wavex.Error.MissingChunks,
-          Wavex.Error.RIFFSizeMismatch,
-          Wavex.Error.UnexpectedEOF,
-          Wavex.Error.UnexpectedFormatSize,
-          Wavex.Error.UnexpectedFourCC,
-          Wavex.Error.UnreadableDate,
-          Wavex.Error.UnreadableTime,
-          Wavex.Error.UnsupportedBitrate,
-          Wavex.Error.UnsupportedFormat,
-          Wavex.Error.ZeroChannels
-        ]
-      ]
+      extras: [{"README.md", title: "Readme"}]
     ]
   end
 

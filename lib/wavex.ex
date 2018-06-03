@@ -3,26 +3,13 @@ defmodule Wavex do
   Read LPCM WAVE data.
   """
 
+  alias Wavex.FourCC
+
   alias Wavex.Chunk.{
     BAE,
     Data,
     Format,
     RIFF
-  }
-
-  alias Wavex.Error.{
-    BlockAlignMismatch,
-    ByteRateMismatch,
-    MissingChunks,
-    RIFFSizeMismatch,
-    UnexpectedEOF,
-    UnexpectedFormatSize,
-    UnexpectedFourCC,
-    UnreadableDate,
-    UnreadableTime,
-    UnsupportedBitrate,
-    UnsupportedFormat,
-    ZeroChannels
   }
 
   @enforce_keys [
@@ -80,18 +67,18 @@ defmodule Wavex do
 
   defp map24(<<>>, _, acc), do: String.reverse(acc)
 
-  @spec skip_chunk(binary) :: {:ok, binary} | {:error, UnexpectedEOF.t()}
+  @spec skip_chunk(binary) :: {:ok, binary} | {:error, :unexpected_eof}
   defp skip_chunk(binary) when is_binary(binary) do
     with <<size::32-little, etc::binary>> <- binary,
          size <- round(size / 2) * 2,
          <<_::binary-size(size), etc::binary>> <- etc do
       {:ok, etc}
     else
-      _ -> {:error, %UnexpectedEOF{}}
+      _ -> {:error, :unexpected_eof}
     end
   end
 
-  @spec read_chunks(binary, map) :: {:ok, map} | {:error, UnexpectedEOF.t()}
+  @spec read_chunks(binary, map) :: {:ok, map} | {:error, :unexpected_eof}
   defp read_chunks(binary, chunks \\ %{})
   defp read_chunks(<<>>, chunks), do: {:ok, chunks}
 
@@ -109,17 +96,20 @@ defmodule Wavex do
     end
   end
 
-  defp read_chunks(binary, _) when is_binary(binary), do: {:error, %UnexpectedEOF{}}
+  defp read_chunks(binary, _) when is_binary(binary), do: {:error, :unexpected_eof}
 
-  @spec verify_riff_size(non_neg_integer, binary) :: :ok | {:error, RIFFSizeMismatch.t()}
+  @spec verify_riff_size(non_neg_integer, binary) ::
+          :ok
+          | {:error,
+             {:unexpected_riff_size, %{expected: non_neg_integer, actual: non_neg_integer}}}
   defp verify_riff_size(actual, binary) do
-    case byte_size(binary) - 0x08 do
+    case byte_size(binary) - 0x0008 do
       ^actual -> :ok
-      expected -> {:error, %RIFFSizeMismatch{expected: expected, actual: actual}}
+      expected -> {:error, {:unexpected_riff_size, %{expected: expected, actual: actual}}}
     end
   end
 
-  @spec verify_chunks(map) :: :ok | {:error, MissingChunks.t()}
+  @spec verify_chunks(map) :: :ok | {:error, {:missing_chunks, [atom]}}
   defp verify_chunks(chunks) do
     chunks_missing =
       for {_, {module, key}} <- @chunks_required, !match?(%{^key => %^module{}}, chunks) do
@@ -128,7 +118,7 @@ defmodule Wavex do
 
     case chunks_missing do
       [] -> :ok
-      missing -> {:error, %MissingChunks{missing: missing}}
+      missing -> {:error, {:missing_chunks, missing}}
     end
   end
 
@@ -170,18 +160,18 @@ defmodule Wavex do
   @spec read(binary) ::
           {:ok, t}
           | {:error,
-             BlockAlignMismatch.t()
-             | ByteRateMismatch.t()
-             | MissingChunks.t()
-             | RIFFSizeMismatch.t()
-             | UnexpectedEOF.t()
-             | UnexpectedFormatSize.t()
-             | UnexpectedFourCC.t()
-             | UnreadableDate.t()
-             | UnreadableTime.t()
-             | UnsupportedBitrate.t()
-             | UnsupportedFormat.t()
-             | ZeroChannels.t()}
+             :unexpected_eof
+             | :zero_channels
+             | {:missing_chunks, [atom]}
+             | {:unexpected_block_align, %{expected: non_neg_integer, actual: non_neg_integer}}
+             | {:unexpected_byte_rate, %{expected: non_neg_integer, actual: non_neg_integer}}
+             | {:unexpected_format_size, non_neg_integer}
+             | {:unexpected_four_cc, %{actual: FourCC.t(), expected: FourCC.t()}}
+             | {:unsupported_bae_version, non_neg_integer}
+             | {:unsupported_bits_per_sample, non_neg_integer}
+             | {:unsupported_format, non_neg_integer}
+             | {:unreadable_date, BAE.date_binary()}
+             | {:unreadable_time, BAE.time_binary()}}
   def read(binary) when is_binary(binary) do
     with {:ok, %RIFF{size: riff_size} = riff, etc} <- RIFF.read(binary),
          :ok <- verify_riff_size(riff_size, binary),
