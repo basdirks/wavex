@@ -14,7 +14,7 @@ This package is still in early beta.
 ```elixir
 def deps do
   [
-    {:wavex, "~> 0.17.0"}
+    {:wavex, "~> 0.18.0"}
   ]
 end
 ```

@@ -154,12 +154,29 @@ defmodule Wavex.Chunk.BAETest do
     end
   end
 
+  defp binary_v2_corrupt(position, part) do
+    size = byte_size(part)
+
+    ExUnitProperties.gen all binary <- binary_v2(),
+                             <<
+                               pre::binary-size(position),
+                               _::binary-size(size),
+                               post::binary
+                             >> = binary do
+      <<
+        pre::binary,
+        part::binary,
+        post::binary
+      >>
+    end
+  end
+
   test "the associated FourCC" do
     assert BAE.four_cc() == "bext"
   end
 
-  describe "reading a BAE chunk" do
-    property "valid version 0" do
+  describe "reading a binary" do
+    property "containing a valid chunk, version 0" do
       check all binary <- binary_v0() do
         {:ok, chunk, ""} = BAE.read(binary)
 
@@ -202,7 +219,7 @@ defmodule Wavex.Chunk.BAETest do
       end
     end
 
-    property "valid version 1" do
+    property "containing a valid chunk, version 1" do
       check all binary <- binary_v1() do
         {:ok, chunk, ""} = BAE.read(binary)
 
@@ -246,7 +263,7 @@ defmodule Wavex.Chunk.BAETest do
       end
     end
 
-    property "valid version 2" do
+    property "containing a valid chunk, version 2" do
       check all binary <- binary_v2() do
         {:ok,
          %BAE{
@@ -292,25 +309,23 @@ defmodule Wavex.Chunk.BAETest do
       end
     end
 
-    property "unknown version" do
-      check all binary <- binary_v2(),
-                version_unsupported <- StreamData.integer(@range_16_unsigned),
-                not (version_unsupported in 0x0000..0x0002) do
-        <<
-          pre::binary-size(354),
-          _::16-little,
-          post::binary
-        >> = binary
+    property "containing chunk with an unexpected FourCC" do
+      check all actual <- StreamData.string(:ascii, length: 4),
+                expected = BAE.four_cc(),
+                actual != expected,
+                binary <- binary_v2_corrupt(0, actual) do
+        assert match?(
+                 {:error, {:unexpected_four_cc, %{expected: ^expected, actual: ^actual}}},
+                 BAE.read(binary)
+               )
+      end
+    end
 
-        binary = <<
-          pre::binary,
-          version_unsupported::16-little,
-          post::binary
-        >>
-
-        {:error, {:unsupported_bae_version, actual}} = BAE.read(binary)
-
-        assert actual == version_unsupported
+    property "containing a chunk with an unknown version" do
+      check all actual <- StreamData.integer(@range_16_unsigned),
+                not (actual in 0x0000..0x0002),
+                binary <- binary_v2_corrupt(354, <<actual::16-little>>) do
+        assert match?({:error, {:unsupported_bae_version, ^actual}}, BAE.read(binary))
       end
     end
   end
